@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yar Demo · Family App</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23faf6ef'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Georgia' font-size='26' fill='%23b9731f'%3E%DB%8C%D8%A7%D8%B1%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:#faf6ef; --cream-2:#f3ecdf; --ink:#1e3a34; --ink-deep:#142823;
+    --ink-soft:#47605a; --saffron:#d98e32; --saffron-deep:#b9731f;
+    --card:#fff; --line:#e7dfd2; --teal:#2e6b5e; --ease:cubic-bezier(.22,.8,.24,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--cream);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+  a{color:inherit}
+  .topbar{display:flex;align-items:center;gap:14px;padding:16px 24px;max-width:1200px;margin:0 auto}
+  .topbar .back{text-decoration:none;font-weight:600;font-size:14px;color:var(--ink-soft)}
+  .topbar .back:hover{color:var(--ink)}
+  .demo-tag{margin-left:auto;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--saffron-deep);border:1.5px solid var(--saffron);border-radius:999px;padding:5px 14px}
+  .stage{display:grid;grid-template-columns:1fr 380px 1fr;gap:32px;align-items:center;max-width:1200px;margin:8px auto 60px;padding:0 24px;min-height:calc(100vh - 120px)}
+  .hint{font-size:15px;color:var(--ink-soft);line-height:1.6;max-width:280px}
+  .hint h1{font-family:'Fraunces',serif;font-size:30px;color:var(--ink);margin-bottom:10px;line-height:1.15}
+  .hint.right{justify-self:end;text-align:right}
+  .hint .k{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--saffron-deep);margin-bottom:8px}
+  .hint p{margin-bottom:12px}
+
+  .phone{width:380px;border-radius:46px;background:var(--ink-deep);padding:13px;box-shadow:0 40px 90px rgba(20,40,35,.3);justify-self:center}
+  .screen{border-radius:34px;overflow:hidden;height:720px;background:var(--cream);display:flex;flex-direction:column;position:relative}
+
+  .app-head{padding:22px 20px 12px;background:var(--card);border-bottom:1px solid var(--line)}
+  .app-head .row{display:flex;align-items:center;gap:12px}
+  .avatar{width:46px;height:46px;border-radius:999px;background:var(--cream-2);display:grid;place-items:center;font-family:Georgia,serif;font-size:20px;color:var(--saffron-deep)}
+  .who b{font-size:17px;font-weight:650;display:block;line-height:1.2}
+  .who small{font-size:12.5px;color:var(--ink-soft)}
+  .heartbeat{display:flex;align-items:center;gap:7px;margin-top:12px;font-size:12px;font-weight:600;color:var(--teal)}
+  .heartbeat .dot{width:8px;height:8px;border-radius:999px;background:#3f9d7a;animation:hb 2s ease-in-out infinite}
+  @keyframes hb{0%,100%{opacity:1}50%{opacity:.4}}
+
+  .body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+  .pane{display:none;flex-direction:column;gap:10px}
+  .pane.on{display:flex}
+
+  .notif{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 15px;font-size:13.5px;line-height:1.5}
+  .nhead{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+  .nicon{width:20px;height:20px;border-radius:6px;background:var(--ink);color:var(--saffron);font-family:Georgia,serif;font-size:11px;display:grid;place-items:center}
+  .napp{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--ink-soft)}
+  .ntime{margin-left:auto;font-size:11px;color:#9aa8a3}
+  .ntitle{font-weight:650;font-size:14px}
+  .nbody{color:#4a5a55}
+  .notif.warm{background:#fdf4e7;border-color:#f0d9b8}
+  .notif.quiet{text-align:center;background:transparent;border-style:dashed;color:var(--ink-soft)}
+  .ok{display:inline-block;margin-top:5px;font-size:11.5px;font-weight:700;color:#2e7d5b}
+  .day-label{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);margin:8px 4px 0}
+
+  .bigbtn{border:0;width:100%;background:var(--saffron-deep);color:var(--cream);border-radius:18px;padding:20px;font-family:'Inter',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:background .2s}
+  .bigbtn:hover{background:#a2621a}
+  .bigbtn.ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--line)}
+  .visit-note{font-size:12.5px;color:var(--ink-soft);text-align:center;line-height:1.5;padding:0 10px}
+
+  .call{position:absolute;inset:0;background:linear-gradient(170deg,#1a332d,#0e1f1b);color:var(--cream);display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:30px;z-index:5}
+  .call.on{display:flex}
+  .call .cavatar{width:110px;height:110px;border-radius:999px;background:rgba(250,246,239,.12);display:grid;place-items:center;font-family:Georgia,serif;font-size:46px;color:var(--saffron);margin-bottom:8px}
+  .call .cname{font-family:'Fraunces',serif;font-size:26px}
+  .call .cstat{font-size:14px;color:#9db8b0}
+  .wave{display:flex;gap:5px;align-items:flex-end;height:30px;margin:16px 0}
+  .wave i{width:5px;border-radius:3px;background:var(--saffron);animation:wv 1s ease-in-out infinite}
+  .wave i:nth-child(1){height:10px}.wave i:nth-child(2){height:24px;animation-delay:.12s}
+  .wave i:nth-child(3){height:16px;animation-delay:.24s}.wave i:nth-child(4){height:28px;animation-delay:.36s}
+  .wave i:nth-child(5){height:12px;animation-delay:.48s}.wave i:nth-child(6){height:22px;animation-delay:.6s}
+  @keyframes wv{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1)}}
+  .endbtn{margin-top:18px;border:0;background:#b8563f;color:#fff;border-radius:999px;padding:14px 34px;font-weight:700;font-size:15px;cursor:pointer;font-family:'Inter',sans-serif}
+  .announce{font-size:13px;color:var(--saffron);font-weight:600;letter-spacing:.03em}
+
+  .pref{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+  .pref .txt{flex:1}
+  .badge{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 10px;white-space:nowrap}
+  .badge.appr{background:#e4efeb;color:var(--teal)}
+  .badge.pend{background:#fdf0dd;color:var(--saffron-deep)}
+  .addpref{display:flex;gap:8px;margin-top:4px}
+  .addpref input{flex:1;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-family:'Inter',sans-serif;font-size:13.5px;background:var(--card);color:var(--ink)}
+  .addpref button{border:0;background:var(--ink);color:var(--cream);border-radius:12px;padding:0 18px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+  .prefnote{font-size:12px;color:var(--ink-soft);line-height:1.5;padding:2px 4px}
+
+  .set{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .set b{display:block;font-size:14px;margin-bottom:10px}
+  .chips{display:flex;gap:7px;flex-wrap:wrap}
+  .chip{border:1.5px solid var(--line);background:var(--cream);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;font-family:'Inter',sans-serif}
+  .chip.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .set .locked{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft)}
+  .set .locked .sw{width:40px;height:24px;border-radius:999px;background:var(--saffron-deep);position:relative;flex:none}
+  .set .locked .sw::after{content:"";position:absolute;right:3px;top:3px;width:18px;height:18px;border-radius:999px;background:#fff}
+  .tier{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .tier:last-child{border-bottom:0}
+  .tier .t-badge{margin-left:auto;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--saffron-deep)}
+
+  .tabs{display:flex;background:var(--card);border-top:1px solid var(--line)}
+  .tab{flex:1;border:0;background:transparent;padding:13px 4px 16px;font-family:'Inter',sans-serif;font-size:11.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .tab .ic{font-size:19px;line-height:1}
+  .tab.on{color:var(--saffron-deep)}
+
+  .toast{position:absolute;left:50%;bottom:86px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--cream);font-size:13px;font-weight:600;border-radius:999px;padding:10px 20px;opacity:0;transition:all .4s var(--ease);pointer-events:none;white-space:nowrap;z-index:6}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* Incoming push banner: the hands-on moment */
+  .banner{
+    position:absolute;top:12px;left:12px;right:12px;z-index:8;cursor:pointer;
+    background:rgba(255,255,255,.97);border:1.5px solid var(--saffron);border-radius:18px;
+    padding:12px 15px;box-shadow:0 14px 40px rgba(20,40,35,.25);
+    transform:translateY(-150%);transition:transform .7s cubic-bezier(.34,1.45,.5,1);
+  }
+  .banner.show{transform:none}
+  .banner .bh{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+  .banner .bh .nicon{width:20px;height:20px;border-radius:6px;background:var(--ink);color:var(--saffron);font-family:Georgia,serif;font-size:11px;display:grid;place-items:center}
+  .banner .bh b{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--ink-soft)}
+  .banner .bh .bt{margin-left:auto;font-size:11px;color:#9aa8a3}
+  .banner .btitle{font-weight:650;font-size:14px}
+  .banner .bbody{font-size:13px;color:#4a5a55;line-height:1.45}
+  .banner .btap{display:inline-block;margin-top:8px;font-size:12px;font-weight:700;color:var(--cream);background:var(--saffron-deep);border-radius:999px;padding:6px 14px}
+
+  @media (max-width:1000px){
+    .stage{grid-template-columns:1fr;gap:28px;justify-items:center}
+    .hint,.hint.right{max-width:420px;text-align:center;justify-self:center}
+    .phone{width:min(380px,92vw)}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="back" href="../index.html">← Back to Yar</a>
+  <span class="demo-tag">Interactive demo · sample data</span>
+</div>
+
+<div class="stage">
+  <div class="hint">
+    <span class="k">The family app</span>
+    <h1>This is what Grandma's daughter sees.</h1>
+    <p>Everything here is live. Tap through the tabs at the bottom of the phone: the feed, a voice drop-in, her care profile, and your notification settings.</p>
+    <p>Notice the green heartbeat under her name. If Yar ever loses connection, that line says so. Silence never means uncertainty.</p>
+  </div>
+
+  <div class="phone">
+    <div class="screen">
+      <div class="app-head">
+        <div class="row">
+          <div class="avatar">یار</div>
+          <div class="who"><b>Grandma</b><small>Room 250 · Golden Valley Rehab</small></div>
+        </div>
+        <div class="heartbeat"><span class="dot"></span> Yar is connected · last update 4 min ago</div>
+      </div>
+
+      <div class="body">
+        <!-- TODAY -->
+        <div class="pane on" id="pane-today">
+          <div class="day-label">Today</div>
+          <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="ntime">2:47 PM</span></div><div class="ntitle">Shower complete, preference honored</div><div class="nbody">With Maria, as her profile asks. She's resting now.<span class="ok">✓ Handled</span></div></div>
+          <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="ntime">12:58 PM</span></div><div class="ntitle">Resolved: chest tightness</div><div class="nbody">She told Yar in Farsi. Nurse Sarah assessed within minutes. Vitals normal, doctor notified.<span class="ok">✓ Resolved</span></div></div>
+          <div class="notif warm"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="ntime">7:14 AM</span></div><div class="ntitle">Breakfast finished</div><div class="nbody">She ate well and asked for tea. In Farsi: صبحانه را خورد و چای خواست.</div></div>
+          <div class="day-label">Yesterday</div>
+          <div class="notif quiet">Nothing unusual yesterday. A calm, ordinary day.</div>
+        </div>
+
+        <!-- VISIT -->
+        <div class="pane" id="pane-visit">
+          <button class="bigbtn" id="dropin">🎙 Drop in by voice</button>
+          <button class="bigbtn ghost" id="dropinv">📹 Drop in with video</button>
+          <p class="visit-note">Yar announces you out loud in her room before connecting. She presses nothing. Staff can pause any visit with one tap during care. Nothing is ever stored.</p>
+          <div class="day-label">Recent visits</div>
+          <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="ntime">Yesterday 9:41 PM</span></div><div class="ntitle">Goodnight call · 4:12</div><div class="nbody">She went to bed smiling.</div></div>
+          <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="ntime">Tue 3:05 AM</span></div><div class="ntitle">Overnight comfort call · 2:04</div><div class="nbody">Back asleep by 3:14 after your voice.</div></div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="pane" id="pane-profile">
+          <div class="day-label">Her care profile</div>
+          <div class="pref"><div class="txt">Sleeps sitting up. Lying flat causes panic; oxygen resolves it.</div><span class="badge appr">✓ Nurse approved</span></div>
+          <div class="pref"><div class="txt">Female caregivers only for bathing.</div><span class="badge appr">✓ Nurse approved</span></div>
+          <div class="pref"><div class="txt">Her daughter's voice calms her at night.</div><span class="badge appr">✓ Nurse approved</span></div>
+          <div class="addpref"><input id="prefin" type="text" placeholder="Suggest something her caregivers should know…" maxlength="90"><button id="prefadd">Send</button></div>
+          <p class="prefnote">Suggestions go to her nurse for one-tap approval. Approved items appear to every shift, before the moment they matter.</p>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="pane" id="pane-settings">
+          <div class="set"><b>How often do you want to hear from Yar?</b>
+            <div class="chips" id="rhythm">
+              <span class="chip">Every event</span>
+              <span class="chip active">Every 3 hours</span>
+              <span class="chip">Morning + night</span>
+              <span class="chip">Once a day</span>
+            </div>
+          </div>
+          <div class="set"><b>Urgent alerts</b>
+            <div class="locked"><span class="sw"></span> Always instant. Urgent moments ignore every setting above.</div>
+          </div>
+          <div class="set"><b>Family access</b>
+            <div class="tier">Mina (you)<span class="t-badge">Spokesperson</span></div>
+            <div class="tier">Noah<span class="t-badge" style="color:var(--teal)">Approved family</span></div>
+            <div class="tier">Cousin Dara<span class="t-badge" style="color:var(--ink-soft)">View only</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CALL OVERLAY -->
+      <div class="call" id="call">
+        <div class="announce" id="announce">Announcing in her room…</div>
+        <div class="cavatar">یار</div>
+        <div class="cname">Grandma</div>
+        <div class="cstat" id="callstat">Connecting</div>
+        <div class="wave" id="callwave" style="visibility:hidden"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <button class="endbtn" id="endcall">End visit</button>
+      </div>
+
+      <div class="toast" id="toast"></div>
+
+      <!-- Incoming urgent notification: tap it to start the drop-in -->
+      <div class="banner" id="banner" role="button" aria-label="Tap to talk to her">
+        <div class="bh"><span class="nicon">یار</span><b>YAR</b><span class="bt">3:05 AM</span></div>
+        <div class="btitle">Grandma is awake and anxious</div>
+        <div class="bbody">The nurse has been alerted. Your voice works better than anything we have.</div>
+        <span class="btap">Tap to talk to her</span>
+      </div>
+
+      <div class="tabs">
+        <button class="tab on" data-pane="today"><span class="ic">🏠</span>Today</button>
+        <button class="tab" data-pane="visit"><span class="ic">🎙</span>Visit</button>
+        <button class="tab" data-pane="profile"><span class="ic">🪷</span>Profile</button>
+        <button class="tab" data-pane="settings"><span class="ic">⚙️</span>Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint right">
+    <span class="k">Try these</span>
+    <p><b>Visit tab:</b> press "Drop in by voice." Watch it announce itself in her room before connecting. That announcement is why staff trust Yar.</p>
+    <p><b>Profile tab:</b> suggest a preference. It goes to her nurse as "pending," never straight to the bedside.</p>
+    <p><b>Settings tab:</b> pick your rhythm. Urgent is locked to instant, for everyone, always.</p>
+    <p style="margin-top:18px"><a href="nurse.html" style="font-weight:700">See the nurse's side →</a></p>
+  </div>
+</div>
+
+<script>
+try {
+  /* Tabs */
+  var tabs=[].slice.call(document.querySelectorAll('.tab'));
+  tabs.forEach(function(t){t.addEventListener('click',function(){
+    tabs.forEach(function(x){x.classList.toggle('on',x===t)});
+    ['today','visit','profile','settings'].forEach(function(p){
+      document.getElementById('pane-'+p).classList.toggle('on',p===t.dataset.pane);
+    });
+  })});
+
+  /* Toast helper */
+  var toast=document.getElementById('toast'),toastT;
+  function say(msg){toast.textContent=msg;toast.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){toast.classList.remove('show')},2600)}
+
+  /* Drop-in call simulation */
+  var call=document.getElementById('call'),announce=document.getElementById('announce'),
+      callstat=document.getElementById('callstat'),callwave=document.getElementById('callwave'),
+      timerI=null,secs=0;
+  function startCall(video){
+    call.classList.add('on');secs=0;
+    announce.textContent='🔊 In her room: "Mina is calling to visit…"';
+    callstat.textContent='Announcing · 3';callwave.style.visibility='hidden';
+    var n=3;var cd=setInterval(function(){n--;if(n>0){callstat.textContent='Announcing · '+n}else{
+      clearInterval(cd);callstat.textContent=(video?'Video':'Voice')+' visit · 0:00';callwave.style.visibility='visible';
+      announce.textContent='Connected. She hears you now.';
+      timerI=setInterval(function(){secs++;var m=Math.floor(secs/60),s=('0'+secs%60).slice(-2);
+        callstat.textContent=(video?'Video':'Voice')+' visit · '+m+':'+s},1000);
+    }},900);
+  }
+  document.getElementById('dropin').addEventListener('click',function(){startCall(false)});
+  document.getElementById('dropinv').addEventListener('click',function(){startCall(true)});
+  document.getElementById('endcall').addEventListener('click',function(){
+    call.classList.remove('on');clearInterval(timerI);
+    if(secs>0)say('Visit logged: '+Math.floor(secs/60)+':'+('0'+secs%60).slice(-2)+' · nothing stored');
+  });
+
+  /* Suggest a preference */
+  var prefin=document.getElementById('prefin');
+  document.getElementById('prefadd').addEventListener('click',function(){
+    var v=prefin.value.trim();if(!v)return;
+    var d=document.createElement('div');d.className='pref';
+    d.innerHTML='<div class="txt"></div><span class="badge pend">Pending nurse approval</span>';
+    d.querySelector('.txt').textContent=v;
+    prefin.parentNode.parentNode.insertBefore(d,prefin.parentNode);
+    prefin.value='';say('Sent to her nurse for approval');
+  });
+
+  /* Rhythm chips */
+  var chips=[].slice.call(document.querySelectorAll('#rhythm .chip'));
+  chips.forEach(function(c){c.addEventListener('click',function(){
+    chips.forEach(function(x){x.classList.toggle('active',x===c)});
+    say('Rhythm set: '+c.textContent);
+  })});
+
+  /* The hands-on moment: an urgent notification drops in; tapping it starts
+     the drop-in call flow, exactly how a real 3 A.M. would go. */
+  var banner=document.getElementById('banner'),bannerTimer;
+  function showBanner(){
+    if(call.classList.contains('on'))return scheduleBanner(20000);
+    banner.classList.add('show');
+  }
+  function scheduleBanner(ms){clearTimeout(bannerTimer);bannerTimer=setTimeout(showBanner,ms)}
+  banner.addEventListener('click',function(){
+    banner.classList.remove('show');
+    announce.textContent='🔊 In her room: "Mina is here with you…"';
+    startCall(false);
+    scheduleBanner(60000);   // it can happen again; this is the demo loop
+  });
+  scheduleBanner(9000);       // first one lands ~9s after the page opens
+  document.getElementById('endcall').addEventListener('click',function(){scheduleBanner(30000)});
+} catch(e){}
+</script>
+
+</body>
+</html>

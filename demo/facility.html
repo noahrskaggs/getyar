@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yar Demo · Facility Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23faf6ef'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Georgia' font-size='26' fill='%23b9731f'%3E%DB%8C%D8%A7%D8%B1%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:#faf6ef; --cream-2:#f3ecdf; --ink:#1e3a34; --ink-deep:#142823;
+    --ink-soft:#47605a; --saffron:#d98e32; --saffron-deep:#b9731f;
+    --card:#fff; --line:#e7dfd2; --teal:#2e6b5e; --red:#b8563f; --ease:cubic-bezier(.22,.8,.24,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#f4f0e6;color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .shell{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+
+  .side{background:var(--ink-deep);color:#cfe0da;padding:22px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+  .side .brand{font-family:'Fraunces',serif;font-size:23px;font-weight:600;color:var(--cream);padding:0 12px 18px;display:flex;align-items:baseline;gap:8px;text-decoration:none}
+  .side .brand span{color:var(--saffron);font-family:Georgia,serif;font-size:18px}
+  .side .sec{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6f8a82;padding:14px 12px 6px}
+  .nitem{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13.5px;font-weight:500;cursor:pointer;border:0;background:transparent;color:#cfe0da;font-family:'Inter',sans-serif;text-align:left;width:100%}
+  .nitem:hover{background:rgba(250,246,239,.07)}
+  .nitem.on{background:rgba(217,142,50,.16);color:var(--cream);font-weight:600}
+  .nitem .ic{width:18px;text-align:center}
+  .side .foot{margin-top:auto;font-size:11.5px;color:#6f8a82;padding:12px;line-height:1.5}
+  .side .foot a{color:var(--saffron);font-weight:600;text-decoration:none}
+
+  .main{display:flex;flex-direction:column;min-width:0}
+  .top{display:flex;align-items:center;gap:16px;padding:14px 28px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+  .top h1{font-family:'Fraunces',serif;font-size:21px;font-weight:600}
+  .top .search{flex:1;max-width:360px;border:1.5px solid var(--line);border-radius:999px;padding:9px 18px;font-size:13px;color:var(--ink-soft);background:var(--cream)}
+  .top .range{margin-left:auto;display:flex;gap:4px;background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:4px}
+  .top .range button{border:0;background:transparent;border-radius:999px;padding:7px 14px;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer}
+  .top .range button.on{background:var(--ink);color:var(--cream)}
+  .top .who{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600}
+  .top .who .av{width:34px;height:34px;border-radius:999px;background:var(--cream-2);display:grid;place-items:center;font-size:13px;color:var(--saffron-deep);font-weight:700}
+  .demo-tag{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--saffron-deep);border:1.5px solid var(--saffron);border-radius:999px;padding:4px 11px}
+
+  .content{padding:26px 28px 60px;display:flex;flex-direction:column;gap:22px}
+  .view{display:none;flex-direction:column;gap:22px}
+  .view.on{display:flex;animation:vin .35s var(--ease)}
+  @keyframes vin{from{opacity:0;transform:translateY(10px)}}
+
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+  .kpis.k4{grid-template-columns:repeat(4,1fr)}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .kpi .lbl{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+  .kpi .val{font-family:'Fraunces',serif;font-size:34px;font-weight:600;line-height:1.15;margin-top:4px}
+  .kpi .delta{font-size:12px;font-weight:700;margin-top:2px}
+  .kpi .delta.up{color:#2e7d5b}.kpi .delta.dn{color:var(--red)}
+  .kpi.hero{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .kpi.hero .lbl{color:#9db8b0}.kpi.hero .val{color:var(--saffron)}
+
+  .row2{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;align-items:stretch}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
+  .panel h2{font-family:'Fraunces',serif;font-size:17.5px;font-weight:600;margin-bottom:4px}
+  .panel .sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:18px}
+
+  .chart{display:flex;align-items:flex-end;gap:10px;height:170px;padding-top:8px}
+  .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;height:100%}
+  .bar .b{border-radius:6px 6px 3px 3px;background:var(--cream-2)}
+  .bar .b.yar{background:var(--saffron)}
+  .bar .cap{font-size:10.5px;text-align:center;color:var(--ink-soft);font-weight:600}
+  .legend{display:flex;gap:16px;font-size:12px;color:var(--ink-soft);margin-top:12px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+
+  .donut-wrap{display:flex;gap:22px;align-items:center}
+  .donut{width:150px;height:150px;border-radius:999px;flex:none;
+    background:conic-gradient(var(--saffron-deep) 0 34%, var(--teal) 34% 56%, #8fb0a7 56% 74%, var(--ink) 74% 84%, #d3b98a 84% 92%, #b8563f 92% 100%);
+    display:grid;place-items:center}
+  .donut::after{content:"48 beds";width:86px;height:86px;border-radius:999px;background:var(--card);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--ink-soft)}
+  .dlegend{display:flex;flex-direction:column;gap:7px;font-size:12.5px;color:var(--ink-soft)}
+  .dlegend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line)}
+  td{padding:11px 12px;border-bottom:1px solid #f0ead9}
+  tr:hover td{background:#fcf9f1}
+  .pill{font-size:10.5px;font-weight:700;border-radius:999px;padding:3px 10px;white-space:nowrap}
+  .pill.g{background:#e4efeb;color:var(--teal)}
+  .pill.y{background:#fdf0dd;color:var(--saffron-deep)}
+  .pill.r{background:#fbeae5;color:var(--red)}
+  .bar-mini{height:6px;border-radius:999px;background:var(--cream-2);min-width:70px;overflow:hidden}
+  .bar-mini i{display:block;height:100%;background:var(--teal);border-radius:999px}
+
+  .roi{background:var(--ink);color:var(--cream);border-radius:18px;padding:24px 28px;display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+  .roi b{font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:var(--saffron);display:block}
+  .roi span{font-size:12.5px;color:#9db8b0}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .fchip{border:1.5px solid var(--line);background:var(--cream);border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;font-family:'Inter',sans-serif}
+  .fchip.on{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .actbtn{border:0;background:var(--saffron-deep);color:var(--cream);border-radius:999px;padding:8px 16px;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+  .actbtn.ghost{background:var(--cream);color:var(--ink);border:1.5px solid var(--line)}
+  .hbar{display:flex;align-items:center;gap:10px;font-size:13px;margin-bottom:9px}
+  .hbar .lab{width:90px;font-weight:600}
+  .hbar .track{flex:1;height:10px;border-radius:999px;background:var(--cream-2);overflow:hidden}
+  .hbar .track i{display:block;height:100%;background:var(--saffron-deep);border-radius:999px}
+  .hbar .n{width:60px;text-align:right;color:var(--ink-soft);font-weight:600;font-size:12px}
+  .loglist{display:flex;flex-direction:column;gap:8px}
+  .logrow{display:flex;gap:10px;align-items:center;background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13px}
+  .logrow .t{font-size:11px;font-weight:700;color:var(--saffron-deep);white-space:nowrap}
+  .logrow .grow{flex:1}
+  .setrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+  .setrow:last-child{border-bottom:0}
+  .setrow b{width:220px}
+  .setrow input,.setrow select{border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;font-family:'Inter',sans-serif;font-size:13px;background:var(--cream);color:var(--ink)}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--cream);font-size:13.5px;font-weight:600;border-radius:999px;padding:12px 24px;opacity:0;transition:all .4s var(--ease);pointer-events:none;white-space:nowrap;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:1080px){
+    .shell{grid-template-columns:1fr}
+    .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center}
+    .side .sec,.side .foot{display:none}
+    .kpis,.kpis.k4{grid-template-columns:repeat(2,1fr)}
+    .row2{grid-template-columns:1fr}
+    .roi{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="side">
+    <a class="brand" href="../index.html">Yar<span>یار</span></a>
+    <div class="sec">Facility</div>
+    <button class="nitem on" data-view="overview"><span class="ic">◫</span> Overview</button>
+    <button class="nitem" data-view="residents"><span class="ic">🛏</span> Residents</button>
+    <button class="nitem" data-view="families"><span class="ic">👥</span> Families</button>
+    <button class="nitem" data-view="staff"><span class="ic">🩺</span> Staff</button>
+    <div class="sec">Insights</div>
+    <button class="nitem" data-view="communication"><span class="ic">📈</span> Communication</button>
+    <button class="nitem" data-view="language"><span class="ic">🌐</span> Language access</button>
+    <button class="nitem" data-view="compliance"><span class="ic">🧾</span> Compliance log</button>
+    <div class="sec">Manage</div>
+    <button class="nitem" data-view="settings"><span class="ic">⚙️</span> Settings</button>
+    <div class="foot">Interactive demo with sample data.<br><a href="index.html">← All demos</a> · <a href="../index.html">Yar home</a></div>
+  </aside>
+
+  <div class="main">
+    <div class="top">
+      <h1 id="vtitle">Golden Valley Rehab · Overview</h1>
+      <div class="search">Search residents, staff, rooms…</div>
+      <div class="range">
+        <button>Today</button><button class="on">This week</button><button>30 days</button>
+      </div>
+      <span class="demo-tag">Demo</span>
+      <div class="who"><span class="av">DA</span> D. Anderson, Administrator</div>
+    </div>
+
+    <div class="content">
+
+      <!-- ================= OVERVIEW ================= -->
+      <div class="view on" id="view-overview">
+        <div class="kpis">
+          <div class="kpi hero"><div class="lbl">Occupied beds on Yar</div><div class="val">42 / 48</div><div class="delta" style="color:#9db8b0">87.5% occupancy</div></div>
+          <div class="kpi"><div class="lbl">Family calls to station</div><div class="val">31</div><div class="delta up">▼ 41% vs pre-Yar</div></div>
+          <div class="kpi"><div class="lbl">Nurse hours recovered</div><div class="val">11.2h</div><div class="delta up">▲ this week</div></div>
+          <div class="kpi"><div class="lbl">Interpreter spend</div><div class="val">$410</div><div class="delta up">▼ $290 vs baseline</div></div>
+          <div class="kpi"><div class="lbl">Unresolved family concerns</div><div class="val">0</div><div class="delta up">7 raised · 7 resolved</div></div>
+        </div>
+        <div class="row2">
+          <div class="panel">
+            <h2>Calls to the nurses' station</h2>
+            <div class="sub">Daily inbound family calls. Saffron is since Yar went live.</div>
+            <div class="chart">
+              <div class="bar"><div class="b" style="height:78%"></div><div class="cap">Mon*</div></div>
+              <div class="bar"><div class="b" style="height:84%"></div><div class="cap">Tue*</div></div>
+              <div class="bar"><div class="b" style="height:70%"></div><div class="cap">Wed*</div></div>
+              <div class="bar"><div class="b yar" style="height:52%"></div><div class="cap">Thu</div></div>
+              <div class="bar"><div class="b yar" style="height:44%"></div><div class="cap">Fri</div></div>
+              <div class="bar"><div class="b yar" style="height:38%"></div><div class="cap">Sat</div></div>
+              <div class="bar"><div class="b yar" style="height:33%"></div><div class="cap">Sun</div></div>
+              <div class="bar"><div class="b yar" style="height:30%"></div><div class="cap">Mon</div></div>
+              <div class="bar"><div class="b yar" style="height:27%"></div><div class="cap">Tue</div></div>
+            </div>
+            <div class="legend"><span><i style="background:var(--cream-2)"></i>Before Yar (*baseline)</span><span><i style="background:var(--saffron)"></i>With Yar</span></div>
+          </div>
+          <div class="panel">
+            <h2>Resident languages</h2>
+            <div class="sub">The family feed is delivered in each family's language.</div>
+            <div class="donut-wrap">
+              <div class="donut"></div>
+              <div class="dlegend">
+                <span><i style="background:var(--saffron-deep)"></i>Somali · 34%</span>
+                <span><i style="background:var(--teal)"></i>Hmong · 22%</span>
+                <span><i style="background:#8fb0a7"></i>English · 18%</span>
+                <span><i style="background:var(--ink)"></i>Oromo · 10%</span>
+                <span><i style="background:#d3b98a"></i>Russian · 8%</span>
+                <span><i style="background:#b8563f"></i>Farsi · 8%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="roi">
+          <div><b>$2,340</b><span>staff time recovered this month, at loaded rates</span></div>
+          <div><b>312</b><span>family questions answered without a phone ringing</span></div>
+          <div><b>9 of 10</b><span>families would recommend the facility, up from 6</span></div>
+          <div><b>3</b><span>admissions this quarter that named Yar in their tour</span></div>
+        </div>
+      </div>
+
+      <!-- ================= RESIDENTS ================= -->
+      <div class="view" id="view-residents">
+        <div class="panel">
+          <h2>Residents on Yar · 42</h2>
+          <div class="sub">Every resident with an active bedside device and consent packet.</div>
+          <div class="filters">
+            <span class="fchip on" data-f="all">All · 42</span>
+            <span class="fchip" data-f="lep">Limited English · 34</span>
+            <span class="fchip" data-f="short">Short-stay rehab · 28</span>
+            <span class="fchip" data-f="attn">Needs attention · 2</span>
+            <button class="actbtn" style="margin-left:auto" data-toast="In the real product this starts the consent + device pairing flow.">+ Add resident</button>
+          </div>
+          <table id="restable">
+            <tr><th>Room</th><th>Resident</th><th>Language</th><th>Stay</th><th>Family plan</th><th>Engagement</th><th>Status</th></tr>
+            <tr data-tags="lep short"><td>250</td><td>Grandma K.</td><td>Farsi</td><td>Rehab · day 12</td><td>Summaries + urgent</td><td><div class="bar-mini"><i style="width:92%"></i></div></td><td><span class="pill g">All resolved</span></td></tr>
+            <tr data-tags="lep short"><td>245</td><td>K. Moua</td><td>Hmong</td><td>Rehab · day 8</td><td>Every event</td><td><div class="bar-mini"><i style="width:84%"></i></div></td><td><span class="pill g">Family visiting</span></td></tr>
+            <tr data-tags="lep"><td>241</td><td>A. Warsame</td><td>Somali</td><td>Long-term</td><td>Morning + night</td><td><div class="bar-mini"><i style="width:71%"></i></div></td><td><span class="pill g">Calm</span></td></tr>
+            <tr data-tags="short attn"><td>247</td><td>R. Johnson</td><td>English</td><td>Rehab · day 21</td><td>Every event</td><td><div class="bar-mini"><i style="width:55%"></i></div></td><td><span class="pill y">1 open request</span></td></tr>
+            <tr data-tags="lep"><td>242</td><td>M. Ivanova</td><td>Russian</td><td>Long-term</td><td>Once a day</td><td><div class="bar-mini"><i style="width:63%"></i></div></td><td><span class="pill g">Calm</span></td></tr>
+            <tr data-tags="lep short attn"><td>248</td><td>S. Osman</td><td>Oromo</td><td>Rehab · day 4</td><td>Summaries + urgent</td><td><div class="bar-mini"><i style="width:77%"></i></div></td><td><span class="pill y">Preference pending</span></td></tr>
+            <tr data-tags="lep short"><td>240</td><td>H. Yang</td><td>Hmong</td><td>Rehab · day 15</td><td>Every 3 hours</td><td><div class="bar-mini"><i style="width:66%"></i></div></td><td><span class="pill g">Calm</span></td></tr>
+            <tr data-tags="lep"><td>246</td><td>D. Ali</td><td>Somali</td><td>Long-term</td><td>Morning + night</td><td><div class="bar-mini"><i style="width:58%"></i></div></td><td><span class="pill g">Calm</span></td></tr>
+            <tr data-tags="short"><td>244</td><td>J. Peterson</td><td>English</td><td>Rehab · day 19</td><td>Every event</td><td><div class="bar-mini"><i style="width:49%"></i></div></td><td><span class="pill g">Calm</span></td></tr>
+            <tr data-tags="lep short"><td>251</td><td>T. Vang</td><td>Hmong</td><td>Rehab · day 2</td><td>Summaries + urgent</td><td><div class="bar-mini"><i style="width:38%"></i></div></td><td><span class="pill g">Onboarding</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- ================= FAMILIES ================= -->
+      <div class="view" id="view-families">
+        <div class="kpis k4">
+          <div class="kpi"><div class="lbl">Family members connected</div><div class="val">117</div><div class="delta up">2.8 per resident</div></div>
+          <div class="kpi"><div class="lbl">Feed opens this week</div><div class="val">1,204</div><div class="delta up">▲ 12%</div></div>
+          <div class="kpi"><div class="lbl">Voice/video visits</div><div class="val">86</div><div class="delta up">avg 4m 40s</div></div>
+          <div class="kpi"><div class="lbl">Pending invites</div><div class="val">5</div><div class="delta">sent, not yet joined</div></div>
+        </div>
+        <div class="panel">
+          <h2>Family access</h2>
+          <div class="sub">Spokesperson-tiered. Urgent alerts break through every rhythm.</div>
+          <table>
+            <tr><th>Family member</th><th>Resident</th><th>Tier</th><th>Feed language</th><th>Rhythm</th><th>Last seen</th></tr>
+            <tr><td>Mina R.</td><td>Grandma K. · 250</td><td><span class="pill y">Spokesperson</span></td><td>Farsi + English</td><td>Summaries + urgent</td><td>14 min ago</td></tr>
+            <tr><td>Noah S.</td><td>Grandma K. · 250</td><td><span class="pill g">Approved</span></td><td>English</td><td>Every event</td><td>1 h ago</td></tr>
+            <tr><td>Pa Moua</td><td>K. Moua · 245</td><td><span class="pill y">Spokesperson</span></td><td>Hmong</td><td>Every event</td><td>now · visiting</td></tr>
+            <tr><td>F. Warsame</td><td>A. Warsame · 241</td><td><span class="pill y">Spokesperson</span></td><td>Somali</td><td>Morning + night</td><td>3 h ago</td></tr>
+            <tr><td>O. Ivanov</td><td>M. Ivanova · 242</td><td><span class="pill g">Approved</span></td><td>Russian</td><td>Once a day</td><td>Yesterday</td></tr>
+            <tr><td>Cousin Dara</td><td>Grandma K. · 250</td><td><span class="pill g">View only</span></td><td>Farsi</td><td>Once a day</td><td>2 d ago</td></tr>
+          </table>
+        </div>
+        <div class="panel">
+          <h2>What families are saying</h2>
+          <div class="sub">Weekly one-question pulse: "Did you feel informed this week?"</div>
+          <div class="hbar"><span class="lab">Yes, fully</span><div class="track"><i style="width:78%"></i></div><span class="n">78%</span></div>
+          <div class="hbar"><span class="lab">Mostly</span><div class="track"><i style="width:17%"></i></div><span class="n">17%</span></div>
+          <div class="hbar"><span class="lab">No</span><div class="track"><i style="width:5%"></i></div><span class="n">5%</span></div>
+        </div>
+      </div>
+
+      <!-- ================= STAFF ================= -->
+      <div class="view" id="view-staff">
+        <div class="kpis k4">
+          <div class="kpi"><div class="lbl">On shift now</div><div class="val">7</div><div class="delta">day shift · east + west</div></div>
+          <div class="kpi"><div class="lbl">Preference approvals waiting</div><div class="val">2</div><div class="delta dn">oldest: 3 h</div></div>
+          <div class="kpi"><div class="lbl">Alerts acknowledged &lt; 5 min</div><div class="val">96%</div><div class="delta up">this week</div></div>
+          <div class="kpi"><div class="lbl">New staff onboarded to Yar</div><div class="val">3</div><div class="delta">10-minute briefing each</div></div>
+        </div>
+        <div class="row2">
+          <div class="panel">
+            <h2>Shift roster</h2>
+            <div class="sub">Yar routes room alerts to whoever holds the wing.</div>
+            <table>
+              <tr><th>Staff</th><th>Role</th><th>Wing</th><th>Open items</th></tr>
+              <tr><td>Sarah T.</td><td>RN</td><td>East</td><td><span class="pill y">2 approvals</span></td></tr>
+              <tr><td>Maria L.</td><td>CNA</td><td>East</td><td><span class="pill g">0</span></td></tr>
+              <tr><td>Julio R.</td><td>CNA</td><td>East</td><td><span class="pill g">0</span></td></tr>
+              <tr><td>Beth N.</td><td>RN</td><td>West</td><td><span class="pill g">0</span></td></tr>
+              <tr><td>Ka Lor</td><td>CNA</td><td>West</td><td><span class="pill g">0</span></td></tr>
+              <tr><td>Front desk</td><td>Recept.</td><td>Lobby</td><td><span class="pill g">Calls down 41%</span></td></tr>
+            </table>
+          </div>
+          <div class="panel">
+            <h2>Approval queue</h2>
+            <div class="sub">Family suggested, one tap to approve. Hard cap: 7 per resident.</div>
+            <div class="loglist">
+              <div class="logrow"><span class="t">Room 248</span><span class="grow">"Prayer time matters to her: please avoid care 1:00 to 1:30 PM when possible."</span><button class="actbtn" data-approve>Approve</button></div>
+              <div class="logrow"><span class="t">Room 250</span><span class="grow">"She likes the window blinds open in the morning."</span><button class="actbtn" data-approve>Approve</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= COMMUNICATION ================= -->
+      <div class="view" id="view-communication">
+        <div class="kpis k4">
+          <div class="kpi"><div class="lbl">Updates published</div><div class="val">238</div><div class="delta up">this week · all human-reviewed</div></div>
+          <div class="kpi"><div class="lbl">Median chart-to-family time</div><div class="val">22m</div><div class="delta up">shift summaries</div></div>
+          <div class="kpi"><div class="lbl">Urgent alerts</div><div class="val">4</div><div class="delta up">all resolved · avg 6 min</div></div>
+          <div class="kpi"><div class="lbl">"Nothing unusual" days</div><div class="val">61%</div><div class="delta">calm, said out loud</div></div>
+        </div>
+        <div class="row2">
+          <div class="panel">
+            <h2>Updates to families, per day</h2>
+            <div class="sub">Every message is logged, timestamped, and exportable.</div>
+            <div class="chart">
+              <div class="bar"><div class="b yar" style="height:52%"></div><div class="cap">Wed</div></div>
+              <div class="bar"><div class="b yar" style="height:60%"></div><div class="cap">Thu</div></div>
+              <div class="bar"><div class="b yar" style="height:58%"></div><div class="cap">Fri</div></div>
+              <div class="bar"><div class="b yar" style="height:44%"></div><div class="cap">Sat</div></div>
+              <div class="bar"><div class="b yar" style="height:47%"></div><div class="cap">Sun</div></div>
+              <div class="bar"><div class="b yar" style="height:66%"></div><div class="cap">Mon</div></div>
+              <div class="bar"><div class="b yar" style="height:71%"></div><div class="cap">Tue</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <h2>Recent log</h2>
+            <div class="sub">The record that protects your staff.</div>
+            <div class="loglist">
+              <div class="logrow"><span class="t">2:47 PM</span><span class="grow">Room 250 · shower complete, preference honored → family (Farsi + English)</span></div>
+              <div class="logrow"><span class="t">12:58 PM</span><span class="grow">Room 250 · urgent resolved: chest tightness, vitals normal → spokesperson</span></div>
+              <div class="logrow"><span class="t">12:31 PM</span><span class="grow">Room 247 · assist request acknowledged by Julio → family</span></div>
+              <div class="logrow"><span class="t">11:02 AM</span><span class="grow">Room 245 · voice visit 6m 12s, announced, no media stored</span></div>
+              <button class="actbtn ghost" data-toast="Exported: 238 updates, timestamped, PDF + CSV.">⬇ Export this week's log</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= LANGUAGE ACCESS ================= -->
+      <div class="view" id="view-language">
+        <div class="kpis k4">
+          <div class="kpi hero"><div class="lbl">Interpreter spend</div><div class="val">$410</div><div class="delta" style="color:#9db8b0">▼ $290 vs pre-Yar baseline</div></div>
+          <div class="kpi"><div class="lbl">Updates translated</div><div class="val">186</div><div class="delta up">this week · 6 languages</div></div>
+          <div class="kpi"><div class="lbl">Human review</div><div class="val">100%</div><div class="delta up">clinical content, per § 1557</div></div>
+          <div class="kpi"><div class="lbl">Interpreter sessions kept</div><div class="val">9</div><div class="delta">consent + care planning, as required</div></div>
+        </div>
+        <div class="row2">
+          <div class="panel">
+            <h2>Translations delivered, by language</h2>
+            <div class="sub">Yar carries the routine moments between qualified interpreter sessions. It never replaces them.</div>
+            <div class="hbar"><span class="lab">Somali</span><div class="track"><i style="width:64%"></i></div><span class="n">64</span></div>
+            <div class="hbar"><span class="lab">Hmong</span><div class="track"><i style="width:42%"></i></div><span class="n">42</span></div>
+            <div class="hbar"><span class="lab">Farsi</span><div class="track"><i style="width:28%"></i></div><span class="n">28</span></div>
+            <div class="hbar"><span class="lab">Oromo</span><div class="track"><i style="width:24%"></i></div><span class="n">24</span></div>
+            <div class="hbar"><span class="lab">Russian</span><div class="track"><i style="width:18%"></i></div><span class="n">18</span></div>
+            <div class="hbar"><span class="lab">Spanish</span><div class="track"><i style="width:10%"></i></div><span class="n">10</span></div>
+          </div>
+          <div class="panel">
+            <h2>Language access file</h2>
+            <div class="sub">Your Section 1557 documentation, always current.</div>
+            <div class="loglist">
+              <div class="logrow"><span class="grow">Notice of language assistance · posted + on file</span><span class="pill g">Current</span></div>
+              <div class="logrow"><span class="grow">Qualified interpreter usage log</span><span class="pill g">Current</span></div>
+              <div class="logrow"><span class="grow">Machine translation human-review log</span><span class="pill g">Current</span></div>
+              <div class="logrow"><span class="grow">LEP resident communication record</span><span class="pill g">Current</span></div>
+              <button class="actbtn ghost" data-toast="Exported: language access file, survey-ready PDF.">⬇ Export 1557 file</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= COMPLIANCE ================= -->
+      <div class="view" id="view-compliance">
+        <div class="kpis k4">
+          <div class="kpi"><div class="lbl">Consents on file</div><div class="val">42/42</div><div class="delta up">§ 144.6502 packets complete</div></div>
+          <div class="kpi"><div class="lbl">Roommate consents</div><div class="val">17/17</div><div class="delta up">shared rooms covered</div></div>
+          <div class="kpi"><div class="lbl">Media stored by Yar</div><div class="val">0</div><div class="delta up">architecturally impossible</div></div>
+          <div class="kpi"><div class="lbl">Open audit items</div><div class="val">0</div><div class="delta up">last review: Jul 1</div></div>
+        </div>
+        <div class="panel">
+          <h2>Compliance records</h2>
+          <div class="sub">Everything a surveyor asks for, one click each.</div>
+          <table>
+            <tr><th>Record</th><th>Coverage</th><th>Last updated</th><th></th></tr>
+            <tr><td>Resident monitoring consents (§ 144.6502)</td><td>42 of 42 residents</td><td>Today</td><td><button class="actbtn ghost" data-toast="Exported: consent packet index.">Export</button></td></tr>
+            <tr><td>Family communication log</td><td>All updates, timestamped</td><td>Live</td><td><button class="actbtn ghost" data-toast="Exported: communication log, PDF + CSV.">Export</button></td></tr>
+            <tr><td>Language access file (§ 1557)</td><td>6 languages</td><td>Today</td><td><button class="actbtn ghost" data-toast="Exported: 1557 file.">Export</button></td></tr>
+            <tr><td>Business Associate Agreement</td><td>Yar ↔ facility</td><td>Signed</td><td><button class="actbtn ghost" data-toast="Opened: BAA on file.">View</button></td></tr>
+            <tr><td>Staff pause / visit audit trail</td><td>All presence events</td><td>Live</td><td><button class="actbtn ghost" data-toast="Exported: presence audit trail.">Export</button></td></tr>
+          </table>
+        </div>
+        <div class="panel">
+          <h2>The standing promises</h2>
+          <div class="sub">Printed on every device, honored in the architecture.</div>
+          <div class="loglist">
+            <div class="logrow"><span class="grow"><b>Nothing is stored.</b> Yar has no recording paths. Audio and video are processed in the moment and discarded.</span><span class="pill g">Verified in code</span></div>
+            <div class="logrow"><span class="grow"><b>Every visit announces itself.</b> No silent connections, ever. Staff can pause with one tap.</span><span class="pill g">Verified in code</span></div>
+            <div class="logrow"><span class="grow"><b>Yar documents and routes; it never guarantees response.</b> Facility protocols own response times.</span><span class="pill g">Contract language</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= SETTINGS ================= -->
+      <div class="view" id="view-settings">
+        <div class="panel">
+          <h2>Facility</h2>
+          <div class="sub">Demo fields; changes show a confirmation but save nowhere.</div>
+          <div class="setrow"><b>Facility name</b><input value="Golden Valley Rehab" size="28"></div>
+          <div class="setrow"><b>Timezone</b><select><option>America/Chicago</option><option>America/New_York</option><option>America/Denver</option></select></div>
+          <div class="setrow"><b>Default family rhythm</b><select><option>Summaries + urgent</option><option>Every event</option><option>Morning + night</option></select></div>
+          <div class="setrow"><b>Quiet-day message time</b><input value="8:00 PM" size="10"></div>
+          <div class="setrow"><b>Preference cap per resident</b><input value="7" size="4"></div>
+          <div class="setrow"><b></b><button class="actbtn" data-toast="Saved. (Demo: nothing actually persists.)">Save changes</button></div>
+        </div>
+        <div class="panel">
+          <h2>Device fleet</h2>
+          <div class="sub">Heartbeats every 60 seconds. Silence is never ambiguous.</div>
+          <table>
+            <tr><th>Device</th><th>Room</th><th>App</th><th>Last heartbeat</th><th>Status</th></tr>
+            <tr><td>YAR-IPAD-001</td><td>250</td><td>0.1</td><td>38s ago</td><td><span class="pill g">Online</span></td></tr>
+            <tr><td>YAR-IPAD-002</td><td>245</td><td>0.1</td><td>52s ago</td><td><span class="pill g">Online · visit live</span></td></tr>
+            <tr><td>YAR-IPAD-003</td><td>241</td><td>0.1</td><td>12s ago</td><td><span class="pill g">Online</span></td></tr>
+            <tr><td>YAR-IPAD-004</td><td>247</td><td>0.1</td><td>9m ago</td><td><span class="pill y">Watchdog watching</span></td></tr>
+            <tr><td>YAR-IPAD-005</td><td>248</td><td>0.1</td><td>41s ago</td><td><span class="pill g">Online</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+try {
+  /* View switching */
+  var TITLES = {
+    overview:'Golden Valley Rehab · Overview', residents:'Residents', families:'Families',
+    staff:'Staff', communication:'Communication', language:'Language access',
+    compliance:'Compliance log', settings:'Settings'
+  };
+  var items=[].slice.call(document.querySelectorAll('.nitem'));
+  items.forEach(function(b){b.addEventListener('click',function(){
+    items.forEach(function(x){x.classList.toggle('on',x===b)});
+    [].slice.call(document.querySelectorAll('.view')).forEach(function(v){
+      v.classList.toggle('on',v.id==='view-'+b.dataset.view);
+    });
+    document.getElementById('vtitle').textContent=TITLES[b.dataset.view]||'Yar';
+    scrollTo(0,0);
+  })});
+
+  /* Range buttons */
+  [].slice.call(document.querySelectorAll('.range button')).forEach(function(b){
+    b.addEventListener('click',function(){
+      [].slice.call(document.querySelectorAll('.range button')).forEach(function(x){x.classList.toggle('on',x===b)});
+    });
+  });
+
+  /* Toast */
+  var toast=document.getElementById('toast'),tT;
+  function say(m){toast.textContent=m;toast.classList.add('show');clearTimeout(tT);tT=setTimeout(function(){toast.classList.remove('show')},2600)}
+  [].slice.call(document.querySelectorAll('[data-toast]')).forEach(function(b){
+    b.addEventListener('click',function(){say(b.dataset.toast)});
+  });
+
+  /* Approvals */
+  [].slice.call(document.querySelectorAll('[data-approve]')).forEach(function(b){
+    b.addEventListener('click',function(){
+      b.textContent='✓ Approved';b.disabled=true;b.style.background='#2e7d5b';
+      say('Approved. Every shift sees it from now on.');
+    });
+  });
+
+  /* Resident filters */
+  var chips=[].slice.call(document.querySelectorAll('.fchip'));
+  chips.forEach(function(c){c.addEventListener('click',function(){
+    chips.forEach(function(x){x.classList.toggle('on',x===c)});
+    var f=c.dataset.f;
+    [].slice.call(document.querySelectorAll('#restable tr[data-tags]')).forEach(function(r){
+      r.style.display=(f==='all'||r.dataset.tags.indexOf(f)>-1)?'':'none';
+    });
+  })});
+} catch(e){}
+</script>
+
+</body>
+</html>

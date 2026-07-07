@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yar. The one at her side.</title>
+<meta name="description" content="Yar is the companion at the bedside. It makes sure your loved one is heard and makes sure you know.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23faf6ef'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Georgia' font-size='26' fill='%23b9731f'%3E%DB%8C%D8%A7%D8%B1%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+  :root {
+    --cream: #faf6ef;
+    --cream-2: #f3ecdf;
+    --ink: #1e3a34;
+    --ink-deep: #142823;
+    --night: #0e1f1b;
+    --ink-soft: #47605a;
+    --saffron: #d98e32;
+    --saffron-deep: #b9731f;
+    --card: #ffffff;
+    --line: #e7dfd2;
+    --teal: #2e6b5e;
+    --max: 1120px;
+    --ease: cubic-bezier(.22,.8,.24,1);
+    --spring: cubic-bezier(.34,1.45,.5,1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 500; letter-spacing: -0.01em; }
+  a { color: inherit; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+  /* Visible by default; animation only once JS proves alive. */
+  .rv { opacity: 1; transform: none; }
+  html.js .rv { opacity: 0; transform: translateY(28px); transition: opacity 1.05s var(--ease), transform 1.05s var(--ease); }
+  html.js .rv.in { opacity: 1; transform: none; }
+  html.js .rv.d1 { transition-delay: .08s; } html.js .rv.d2 { transition-delay: .16s; }
+  html.js .rv.d3 { transition-delay: .24s; } html.js .rv.d4 { transition-delay: .32s; }
+
+  /* Word-by-word headline rise */
+  html.js .split .w { display: inline-block; opacity: 0; transform: translateY(.6em) rotate(1.5deg); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+  html.js .split.in .w { opacity: 1; transform: none; }
+
+  /* Scroll progress thread */
+  #progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 100%;
+    background: linear-gradient(90deg, var(--saffron-deep), var(--saffron));
+    transform-origin: 0 50%; transform: scaleX(0); z-index: 90;
+  }
+
+  /* ---------- Floating pill header: readable over every background ---------- */
+  header { position: fixed; top: 10px; left: 0; right: 0; z-index: 60; pointer-events: none; }
+  nav {
+    pointer-events: auto;
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: var(--max); margin: 0 auto; padding: 10px 12px 10px 22px;
+    background: rgba(250,246,239,.86);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(231,223,210,.8);
+    border-radius: 999px;
+    box-shadow: 0 6px 30px rgba(20,40,35,.08);
+  }
+  @media (min-width: 1180px) { header { padding: 0 24px; } }
+  @media (max-width: 1179px) { nav { margin: 0 16px; } }
+  .brand { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 600; text-decoration: none; display: flex; align-items: baseline; }
+  .brand span { color: var(--saffron-deep); font-size: 20px; margin-inline-start: 9px; font-family: Georgia, serif; }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a { text-decoration: none; font-size: 14.5px; font-weight: 500; color: var(--ink-soft); transition: color .15s; }
+  .nav-links a:hover { color: var(--ink); }
+  .btn {
+    display: inline-block; background: var(--ink); color: var(--cream) !important;
+    padding: 12px 26px; border-radius: 999px; text-decoration: none;
+    font-weight: 600; font-size: 15px; transition: transform .18s var(--ease), background .18s, box-shadow .18s;
+  }
+  .btn:hover { background: var(--ink-deep); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(20,40,35,.22); }
+  .btn.ghost { background: transparent; color: var(--ink) !important; border: 1.5px solid var(--ink); }
+  .btn.ghost:hover { background: rgba(30,58,52,.06); }
+  .btn.saffron { background: var(--saffron-deep); }
+  .btn.saffron:hover { background: #a2621a; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 140px 0 40px; position: relative; }
+  .hero .glyph-bg {
+    position: absolute; right: -2%; top: 4%; font-family: Georgia, serif;
+    font-size: clamp(260px, 36vw, 480px); line-height: 1; color: var(--cream-2);
+    z-index: -1; user-select: none; pointer-events: none;
+  }
+  .hero-grid { display: grid; grid-template-columns: 1.08fr .92fr; gap: 56px; align-items: center; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 9px;
+    border: 1px solid var(--line); background: var(--card); border-radius: 999px;
+    padding: 7px 16px; font-size: 13.5px; font-weight: 600; color: var(--ink-soft);
+    margin-bottom: 26px;
+  }
+  .eyebrow .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--saffron); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: .55; } }
+  .hero h1 { font-size: clamp(44px, 5.6vw, 76px); line-height: 1.03; margin-bottom: 24px; }
+  .hero h1 em { font-style: italic; color: var(--saffron-deep); }
+  .hero p.lede { font-size: clamp(18px, 2vw, 21px); color: var(--ink-soft); max-width: 520px; margin-bottom: 38px; }
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .hero .meaning { margin-top: 44px; font-size: 15px; color: var(--ink-soft); }
+  .hero .meaning em { font-family: 'Fraunces', serif; }
+  .hero .meaning .fa { font-family: Georgia, serif; color: var(--saffron-deep); }
+
+  /* ---------- Phone ---------- */
+  .phone-wrap { display: flex; justify-content: center; perspective: 1200px; }
+  .phone {
+    width: 350px; border-radius: 42px; background: var(--ink-deep);
+    padding: 12px; box-shadow: 0 30px 80px rgba(20,40,35,.28), 0 4px 16px rgba(20,40,35,.16);
+  }
+  .hero .phone { transform: rotateY(-7deg) rotateX(2deg); transition: transform .6s var(--ease); }
+  .hero .phone:hover { transform: none; }
+  .phone.buzz { animation: buzz .4s ease; }
+  @keyframes buzz {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-3px) rotate(-.4deg); }
+    40% { transform: translateX(3px) rotate(.4deg); }
+    60% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
+  }
+  .screen {
+    border-radius: 31px; overflow: hidden; height: 580px;
+    display: flex; flex-direction: column;
+    background: linear-gradient(170deg, #f6efe2, #efe4cf);
+    transition: background 1s ease;
+  }
+  .phone.nightscreen .screen { background: linear-gradient(170deg, #1a332d, #0e1f1b); }
+  .screen-head {
+    padding: 20px 20px 12px; display: flex; align-items: baseline; gap: 10px;
+  }
+  .screen-head .stime { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 600; transition: color 1s ease; }
+  .screen-head .sdate { font-size: 12.5px; color: var(--ink-soft); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; transition: color 1s ease; }
+  .phone.nightscreen .stime { color: var(--cream); }
+  .phone.nightscreen .sdate { color: #8fb0a7; }
+
+  /* ---------- iOS-style notifications ---------- */
+  .nstack { padding: 6px 12px 14px; display: flex; flex-direction: column; gap: 9px; flex: 1; overflow: hidden; }
+  .notif {
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(8px);
+    border-radius: 18px; padding: 11px 14px 12px;
+    box-shadow: 0 4px 18px rgba(20,40,35,.10);
+    font-size: 13px; line-height: 1.45;
+  }
+  .phone.nightscreen .notif { background: rgba(250,246,239,.95); }
+  .nhead { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+  .nicon {
+    width: 20px; height: 20px; border-radius: 6px; background: var(--ink);
+    color: var(--saffron); font-family: Georgia, serif; font-size: 11px;
+    display: grid; place-items: center; flex: none;
+  }
+  .napp { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--ink-soft); }
+  .nto {
+    font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    padding: 2.5px 8px; border-radius: 999px;
+  }
+  .nto.fam { background: #fdf0dd; color: var(--saffron-deep); }
+  .nto.nur { background: #e4efeb; color: var(--teal); }
+  .ntime { margin-left: auto; font-size: 11px; color: #9aa8a3; font-weight: 500; }
+  .ntitle { font-weight: 650; font-size: 13.5px; margin-bottom: 1px; }
+  .nbody { color: #4a5a55; }
+  .notif.urgent { box-shadow: 0 4px 18px rgba(185,115,31,.22); outline: 1.5px solid var(--saffron); }
+  .talk {
+    display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 700;
+    color: var(--cream); background: var(--saffron-deep); border-radius: 999px; padding: 6px 14px;
+  }
+  .ok { display: inline-block; margin-top: 5px; font-size: 11.5px; font-weight: 700; color: #2e7d5b; }
+  html.js .notif.drop { transform: translateY(-140%) scale(.96); opacity: 0; }
+  html.js .notif { transition: transform .95s var(--spring), opacity .6s ease; }
+  .notif .cavatar-row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .notif .cavatar {
+    width: 40px; height: 40px; border-radius: 999px; background: var(--cream-2);
+    display: grid; place-items: center; font-family: Georgia, serif; font-size: 18px; color: var(--saffron-deep); flex: none;
+  }
+  .wave { display: flex; gap: 4px; align-items: flex-end; height: 20px; margin-top: 9px; }
+  .wave i { width: 4px; border-radius: 3px; background: var(--saffron-deep); animation: wv 1s ease-in-out infinite; }
+  .wave i:nth-child(1) { height: 8px; } .wave i:nth-child(2) { height: 17px; animation-delay: .12s; }
+  .wave i:nth-child(3) { height: 11px; animation-delay: .24s; } .wave i:nth-child(4) { height: 19px; animation-delay: .36s; }
+  .wave i:nth-child(5) { height: 9px; animation-delay: .48s; } .wave i:nth-child(6) { height: 15px; animation-delay: .6s; }
+  @keyframes wv { 0%,100% { transform: scaleY(.5); } 50% { transform: scaleY(1); } }
+
+  /* ---------- Stats: flowing, gradient numerals ---------- */
+  .stats { padding: 90px 0 40px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; text-align: center; }
+  .stat .num {
+    font-family: 'Fraunces', serif; font-size: clamp(48px, 6vw, 76px); font-weight: 650; line-height: 1;
+    background: linear-gradient(160deg, var(--saffron-deep) 20%, var(--ink) 90%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .stat .cap { font-size: 15px; color: var(--ink-soft); max-width: 260px; margin: 12px auto 0; }
+
+  section { padding: 100px 0; }
+  .kicker { text-transform: uppercase; letter-spacing: .14em; font-size: 13px; font-weight: 700; color: var(--saffron-deep); margin-bottom: 14px; }
+  section h2 { font-size: clamp(32px, 4vw, 50px); line-height: 1.1; margin-bottom: 18px; max-width: 760px; }
+  section p.sub { color: var(--ink-soft); max-width: 640px; font-size: 18px; }
+
+  /* ---------- Dark floating sheets (story, join) ---------- */
+  .sheet {
+    background: var(--ink); color: var(--cream);
+    border-radius: clamp(28px, 4vw, 56px);
+    margin: 30px clamp(10px, 2vw, 36px);
+    position: relative; overflow: hidden;
+  }
+  .sheet .glyph-bg {
+    position: absolute; left: -4%; bottom: -22%; font-family: Georgia, serif;
+    font-size: 380px; line-height: 1; color: rgba(250,246,239,.045);
+    user-select: none; pointer-events: none;
+  }
+  .sheet .kicker { color: var(--saffron); }
+  .story p { color: #cfe0da; max-width: 700px; font-size: 19px; margin-bottom: 22px; }
+  .story p strong { color: var(--cream); font-weight: 600; }
+  .story-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 64px; align-items: center; }
+  .quote-card {
+    background: var(--cream); color: var(--ink); border-radius: 22px;
+    padding: 32px 30px; font-family: 'Fraunces', Georgia, serif; font-size: clamp(19px, 1.8vw, 23px); line-height: 1.5;
+    box-shadow: 0 30px 70px rgba(0,0,0,.35);
+    transform: rotate(1.6deg);
+  }
+  html.js .quote-card.rv { transform: rotate(6deg) translateY(30px); }
+  html.js .quote-card.rv.in { transform: rotate(1.6deg) translateY(0); }
+  .quote-card .attr {
+    display: inline-block; margin-top: 16px; font-family: 'Inter', sans-serif; font-size: 12px;
+    font-weight: 700; color: var(--saffron-deep); text-transform: uppercase; letter-spacing: .08em;
+    border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px;
+  }
+  .story .closer-line { font-family: 'Fraunces', serif; font-size: clamp(22px, 2.6vw, 30px); color: var(--cream); margin-top: 36px; line-height: 1.3; }
+  .story .closer-line em { color: var(--saffron); font-style: italic; }
+
+  /* ---------- Promise cards ---------- */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 52px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 22px;
+    padding: 36px 30px; display: flex; flex-direction: column; gap: 12px;
+    transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .card:hover { transform: translateY(-6px) rotate(-.3deg); box-shadow: 0 24px 48px rgba(30,58,52,.11); }
+  .card .n {
+    width: 42px; height: 42px; border-radius: 999px; background: var(--cream);
+    border: 1px solid var(--line); display: grid; place-items: center;
+    font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; color: var(--saffron-deep);
+  }
+  .card h3 { font-size: 23px; }
+  .card p { color: var(--ink-soft); font-size: 16px; }
+  .card .ex {
+    margin-top: auto; padding-top: 16px; border-top: 1px dashed var(--line);
+    font-size: 15px; color: var(--ink); font-style: italic;
+  }
+  .card .ex-notif { margin-top: auto; padding-top: 16px; border-top: 1px dashed var(--line); }
+  .card .ex-notif .inner {
+    display: flex; gap: 10px; align-items: flex-start;
+    background: var(--cream); border: 1px solid var(--line); border-radius: 14px;
+    padding: 12px 14px; font-size: 13.5px; line-height: 1.5; font-style: normal;
+  }
+  .card .ex-notif b { font-weight: 650; display: block; font-size: 13px; }
+  .card .ex-notif .nbody { color: var(--ink-soft); }
+
+  /* ============ LIVE THE DAY ============ */
+  .demo { padding: 0; transition: background 1.2s ease, color 1.2s ease; }
+  .demo.m-morn  { background: var(--cream); }
+  .demo.m-day   { background: var(--cream-2); }
+  .demo.m-dusk  { background: #ead9bd; }
+  .demo.m-night { background: var(--night); color: var(--cream); }
+  .demo.m-dawn  { background: var(--cream); }
+  .demo.m-night .kicker { color: var(--saffron); }
+  .demo.m-night .step p, .demo.m-night .demo-head p.sub { color: #b9cec8; }
+  .demo.m-night .step .time { color: var(--saffron); }
+  .demo.m-night .scene { background: #16302a; border-color: #24443c; color: #dfeae6; }
+  .demo.m-night .scene .tag { color: #8fb0a7; }
+
+  .demo-head { padding: 100px 0 0; text-align: center; }
+  .demo-head h2, .demo-head p.sub { margin-inline: auto; }
+  .sound-pill {
+    display: inline-flex; align-items: center; gap: 9px; margin-top: 26px;
+    border: 1.5px solid var(--saffron-deep); background: transparent; color: inherit;
+    border-radius: 999px; padding: 11px 22px; font-family: 'Inter', sans-serif;
+    font-size: 14.5px; font-weight: 600; cursor: pointer; transition: background .2s, color .2s;
+  }
+  .sound-pill.on { background: var(--saffron-deep); color: var(--cream); }
+
+  .demo-grid { display: grid; grid-template-columns: 1fr 410px; gap: 72px; align-items: start; }
+  .steps { padding-bottom: 10vh; }
+  .step { min-height: 92vh; display: flex; flex-direction: column; justify-content: center; }
+  .step .time {
+    font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--saffron-deep); margin-bottom: 10px;
+  }
+  .step h3 { font-size: clamp(26px, 3vw, 37px); line-height: 1.12; margin-bottom: 14px; max-width: 470px; }
+  .step p { color: var(--ink-soft); max-width: 450px; font-size: 17px; margin-bottom: 18px; transition: color 1.2s ease; }
+  .scene {
+    max-width: 450px; border-radius: 18px; border: 1px solid var(--line);
+    padding: 16px 18px; font-size: 15px; line-height: 1.55;
+    background: var(--card); transition: background 1.2s ease, border-color 1.2s ease, color 1.2s ease;
+  }
+  .scene .tag {
+    display: block; font-size: 11.5px; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; margin-bottom: 6px; color: var(--ink-soft);
+  }
+  .scene .fa {
+    display: block; direction: rtl; text-align: right;
+    font-family: Georgia, serif; font-size: 19px; margin-bottom: 6px;
+  }
+  .scene .gloss { font-style: italic; font-size: 14px; opacity: .75; }
+
+  .device-col { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; justify-content: center; }
+
+  .demo-close { text-align: center; padding: 10px 0 110px; }
+  .demo-close .big { font-family: 'Fraunces', serif; font-size: clamp(26px, 3.4vw, 40px); line-height: 1.2; max-width: 640px; margin: 0 auto 28px; }
+
+  /* ============ THREE PEOPLE, ONE HALLWAY (pain points) ============ */
+  .voices { background: linear-gradient(180deg, var(--cream) 0%, var(--cream-2) 50%, var(--cream) 100%); }
+  .persona { display: grid; grid-template-columns: .9fr 1.1fr; gap: 56px; align-items: center; padding: 70px 0; }
+  .persona.flip { grid-template-columns: 1.1fr .9fr; }
+  .persona.flip .p-quotes { order: -1; }
+  .p-label {
+    font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--saffron-deep); margin-bottom: 12px;
+  }
+  .persona h3 { font-size: clamp(26px, 3vw, 38px); line-height: 1.12; margin-bottom: 14px; }
+  .persona .p-ans { color: var(--ink-soft); font-size: 17px; max-width: 440px; }
+  .persona .p-ans strong { color: var(--ink); }
+  .p-quotes { display: flex; flex-direction: column; gap: 14px; }
+  .quote {
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px 18px 18px 4px;
+    padding: 16px 20px; font-size: 15.5px; line-height: 1.55; max-width: 480px;
+    box-shadow: 0 4px 20px rgba(30,58,52,.05);
+  }
+  .quote.right { border-radius: 18px 18px 4px 18px; margin-left: auto; }
+  .quote .src {
+    display: inline-block; margin-top: 12px; font-size: 11.5px; font-weight: 700;
+    color: var(--ink-soft); text-transform: uppercase; letter-spacing: .07em;
+    border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; background: var(--cream);
+  }
+  .quote.stat-q { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+  .quote.stat-q .src { color: var(--saffron); border-color: rgba(250,246,239,.25); background: transparent; }
+  .quote.stat-q b { color: var(--saffron); font-family: 'Fraunces', serif; font-size: 22px; font-weight: 600; }
+
+  /* ---------- Notification modes ---------- */
+  .modes { background: var(--cream); }
+  .seg {
+    display: inline-flex; gap: 4px; background: var(--card);
+    border: 1px solid var(--line); border-radius: 999px; padding: 5px; margin: 36px 0 30px;
+  }
+  .seg-btn {
+    border: 0; background: transparent; font-family: 'Inter', sans-serif;
+    font-size: 15px; font-weight: 600; color: var(--ink-soft);
+    padding: 11px 24px; border-radius: 999px; cursor: pointer;
+    transition: background .25s var(--ease), color .25s;
+  }
+  .seg-btn.active { background: var(--ink); color: var(--cream); }
+  .seg-btn small { display: block; font-size: 11px; font-weight: 500; opacity: .72; margin-top: 1px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .chip {
+    border: 1.5px solid var(--line); background: var(--card); border-radius: 999px;
+    padding: 7px 15px; font-size: 13px; font-weight: 600; color: var(--ink-soft);
+    cursor: pointer; font-family: 'Inter', sans-serif; transition: all .2s;
+  }
+  .chip.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+  .pane { display: none; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: start; }
+  .pane.active { display: grid; animation: paneIn .5s var(--ease); }
+  @keyframes paneIn { from { opacity: 0; transform: translateY(14px); } }
+  .pane-copy h3 { font-size: 26px; margin-bottom: 12px; }
+  .pane-copy p { color: var(--ink-soft); max-width: 420px; }
+  .pane-feed { display: flex; flex-direction: column; gap: 10px; }
+  html.js .pane.active .pane-feed .notif { animation: rise .5s var(--ease) both; }
+  html.js .pane.active .pane-feed .notif:nth-child(1) { animation-delay: .1s; }
+  html.js .pane.active .pane-feed .notif:nth-child(2) { animation-delay: .22s; }
+  html.js .pane.active .pane-feed .notif:nth-child(3) { animation-delay: .34s; }
+  html.js .pane.active .pane-feed .notif:nth-child(4) { animation-delay: .46s; }
+  html.js .pane.active .pane-feed .notif:nth-child(5) { animation-delay: .58s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+  .pane-feed .notif { background: var(--card); border: 1px solid var(--line); box-shadow: 0 4px 20px rgba(30,58,52,.05); font-size: 14px; }
+
+  /* ---------- Facilities: linear staggered rows ---------- */
+  .facilities { background: linear-gradient(180deg, var(--cream), var(--cream-2)); }
+  .fac-rows { display: flex; flex-direction: column; gap: 20px; margin-top: 52px; }
+  .fac-row {
+    background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+    padding: 28px 32px; max-width: 720px; box-shadow: 0 10px 34px rgba(30,58,52,.05);
+    transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .fac-row:hover { transform: translateY(-4px); box-shadow: 0 20px 44px rgba(30,58,52,.1); }
+  .fac-row:nth-child(even) { margin-left: auto; }
+  .fac-row strong { display: block; font-family: 'Fraunces', serif; font-weight: 600; font-size: 21px; margin-bottom: 6px; color: var(--ink); }
+  .fac-row p { color: var(--ink-soft); font-size: 16px; }
+  .assure { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 56px; }
+  .assure > div {
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 24px 26px; font-size: 15px; color: var(--ink-soft);
+  }
+  .assure strong { color: var(--ink); display: block; margin-bottom: 4px; }
+  .fac-cta { text-align: center; margin-top: 44px; }
+
+  .join { text-align: center; padding: 100px 24px; }
+  .join h2 { margin-inline: auto; color: var(--cream); }
+  .join p.sub { margin: 0 auto 38px; color: #cfe0da; }
+
+  footer { padding: 40px 0 72px; text-align: center; color: var(--ink-soft); font-size: 14.5px; }
+  footer .fa { font-family: Georgia, serif; font-size: 26px; color: var(--saffron-deep); display: block; margin-bottom: 10px; }
+  footer .closer { font-family: 'Fraunces', serif; font-size: 19px; color: var(--ink); margin-top: 10px; }
+
+  @media (max-width: 900px) {
+    .hero-grid, .story-grid, .persona, .persona.flip { grid-template-columns: 1fr; }
+    .assure { grid-template-columns: 1fr; }
+    .fac-row:nth-child(even) { margin-left: 0; }
+    .persona.flip .p-quotes { order: 0; }
+    .phone-wrap { margin-top: 12px; }
+    .stats-grid, .cards { grid-template-columns: 1fr; gap: 40px; }
+    .nav-links a:not(.btn) { display: none; }
+    .hero { padding: 116px 0 48px; }
+    section { padding: 68px 0; }
+    .note { position: static; }
+    .demo-grid { grid-template-columns: 1fr; gap: 0; }
+    .device-col { position: sticky; top: 60px; height: auto; padding: 12px 0; z-index: 5; }
+    .device-col .phone { width: 280px; padding: 9px; border-radius: 32px; }
+    .device-col .screen { height: 400px; border-radius: 24px; }
+    .step { min-height: 80vh; }
+    .pane { grid-template-columns: 1fr; gap: 26px; }
+    .persona { padding: 48px 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    html.js .rv, html.js .split .w { opacity: 1 !important; transform: none !important; }
+    html.js .notif.drop { opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress" aria-hidden="true"></div>
+
+<header>
+  <nav>
+    <a class="brand" href="#">Yar<span>یار</span></a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#day">Live the day</a>
+      <a href="#voices">Who it's for</a>
+      <a href="demo/index.html">Try the demo</a>
+      <a class="btn" href="#join">Join the waitlist</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+<div class="hero">
+  <div class="glyph-bg" id="pglyph" aria-hidden="true">یار</div>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow rv"><span class="dot"></span> Founding pilot forming in Minnesota</div>
+      <h1 class="rv d1 split">The one at <em>her</em> side.</h1>
+      <p class="lede rv d2">Yar is the companion at the bedside. It makes sure your loved one is heard. It makes sure you know.</p>
+      <div class="cta-row rv d3">
+        <a class="btn saffron" href="demo/index.html">Try the live demo</a>
+        <a class="btn ghost" href="#facilities">I run a facility</a>
+      </div>
+      <p class="meaning rv d4"><em>Yar</em> <span class="fa">(یار)</span> is Farsi for <em>companion, friend, the one at your side.</em></p>
+    </div>
+    <div class="phone-wrap rv d2">
+      <div class="phone" aria-hidden="true">
+        <div class="screen">
+          <div class="screen-head"><span class="stime">9:41</span><span class="sdate">Golden Valley Rehab · Room 250</span></div>
+          <div class="nstack" id="feed">
+            <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto fam">Family</span><span class="ntime">now</span></div><div class="ntitle">Good morning</div><div class="nbody">Grandma is up and dressed. Breakfast is next.</div></div>
+            <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto fam">Family</span><span class="ntime">32m ago</span></div><div class="ntitle">She slept well</div><div class="nbody">Through the night, sitting up the way she needs.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="wrap stats-grid">
+    <div class="stat rv"><div class="num"><span data-count="63">63</span>M</div><div class="cap">Americans care for a family member. That is one in four adults.</div></div>
+    <div class="stat rv d1"><div class="num">Every day</div><div class="cap">families drive to facilities just to learn what happened since yesterday.</div></div>
+    <div class="stat rv d2"><div class="num"><span data-count="25.6">25.6</span>M</div><div class="cap">people in the U.S. cannot easily be heard in English when it matters most.</div></div>
+  </div>
+</div>
+
+<section class="sheet story" id="story">
+  <div class="glyph-bg" aria-hidden="true">یار</div>
+  <div class="wrap story-grid" style="padding-block: 100px;">
+    <div>
+      <div class="kicker rv">Why Yar exists</div>
+      <h2 class="rv d1 split">Built so that no one is left unheard.</h2>
+      <p class="rv d2">Yar started the way every good medical device starts. Someone needed it, and nothing else worked.</p>
+      <p class="rv d2">Our founder's grandmother had a stroke and entered rehab in Minnesota. She couldn't make herself understood. Her family couldn't know she was okay without standing in her room. So they stood in her room, every single day, because there was no other way.</p>
+      <p class="rv d3">Yar is the other way.</p>
+      <p class="closer-line rv d4">Real people, with real problems, deserve a <em>real solution.</em></p>
+    </div>
+    <div class="quote-card rv d2">
+      "We've tried everything. It still doesn't feel like she's cared for unless I'm in the room."
+      <span class="attr">A daughter, before Yar</span>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="kicker rv">How it works</div>
+    <h2 class="rv d1 split">Three promises to every family.</h2>
+    <p class="sub rv d2">Yar is always on. It sees and hears the room the way a good nurse would, understands what matters, and keeps none of it. No footage. No archive. Just the right message to the right person, the moment it counts.</p>
+    <div class="cards">
+      <div class="card rv">
+        <div class="n">1</div>
+        <h3>Know, without asking.</h3>
+        <p>The care team already records the day: meals, sleep, showers, medications, mood. Yar turns their notes into a clear, gentle feed on your phone, in your language. Nurses do nothing new. You call no one. And when nothing happened, Yar says so: "Nothing unusual today." Silence never means uncertainty.</p>
+        <div class="ex-notif"><div class="inner"><span class="nicon">یار</span><div><b>This afternoon</b><span class="nbody">She ate well, walked with therapy, and is resting. All calm.</span></div></div></div>
+      </div>
+      <div class="card rv d1">
+        <div class="n">2</div>
+        <h3>Be there, from anywhere.</h3>
+        <p>Approved family can drop in by voice or video. She answers nothing, presses nothing. Every drop-in announces itself out loud before connecting, staff can pause it with one tap during care, and Yar stores no footage. There is nothing to replay, and the device says so right on it.</p>
+        <p class="ex">"It's me. Take your walker. Let's walk to breakfast together. I'm with you."</p>
+      </div>
+      <div class="card rv d2">
+        <div class="n">3</div>
+        <h3>Yar remembers what matters.</h3>
+        <p>Every patient has things the chart doesn't capture. Family suggests them, a nurse approves them with one tap, and Yar puts them in front of the right person before it matters. Not after.</p>
+        <p class="ex">Sleeps sitting up. Lying flat causes panic; oxygen resolves it. Prefers a female caregiver for bathing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LIVE THE DAY ============ -->
+<section class="demo m-morn" id="day">
+  <div class="demo-head wrap">
+    <div class="kicker rv">Live the day</div>
+    <h2 class="rv d1 split">Scroll through one day with Yar.</h2>
+    <p class="sub rv d2">On the left, what happens in Room 250. On the phone, what Yar sends: one message for the nurse, in clinical language, and one for the family, in human words. Same moment, two translations.</p>
+    <button class="sound-pill rv d3" id="soundbtn" aria-pressed="false">🔔 Turn sound on for the full experience</button>
+  </div>
+  <div class="wrap demo-grid">
+    <div class="steps">
+
+      <div class="step">
+        <div class="time">7:14 AM</div>
+        <h3 class="split">The day starts without a phone call.</h3>
+        <p>The aide charts breakfast the way she always has. Yar reads what the care team writes and turns it into plain, warm words in the family's language. Nobody at the facility lifts a finger they weren't already lifting.</p>
+        <div class="scene"><span class="tag">In the chart</span>Resident up and dressed. Ate most of breakfast, requested tea. Pleasant this morning.</div>
+      </div>
+
+      <div class="step">
+        <div class="time">12:47 PM</div>
+        <h3 class="split">She says it in Farsi. Yar says it twice.</h3>
+        <p>No call button pressed. No English required. Grandma speaks to her room, and Yar sends two different messages: the nurse gets clinical urgency, and the family gets the calm truth after help has already arrived. One moment, translated for each person who needs it.</p>
+        <div class="scene"><span class="tag">She says, out loud</span><span class="fa">سرفه می‌کنم، قفسه سینه‌ام تنگ است و سرگیجه دارم</span><span class="gloss">"I'm coughing, my chest feels tight, and I'm dizzy."</span></div>
+      </div>
+
+      <div class="step">
+        <div class="time">3:20 PM</div>
+        <h3 class="split">The near-miss that never happens.</h3>
+        <p>Her profile says female caregivers only for bathing. Family suggested it, a nurse approved it, and every shift can see it. Today her usual aide called out sick and the schedule was about to send someone else. Yar catches it before anyone reaches her door.</p>
+        <div class="scene"><span class="tag">In her profile · approved by her nurse</span>Female caregivers only for bathing. Sleeps sitting up. Her daughter's voice calms her.</div>
+      </div>
+
+      <div class="step">
+        <div class="time">9:41 PM</div>
+        <h3 class="split">Goodnight, from twelve miles away.</h3>
+        <p>Approved family drops in by voice. The device announces the call out loud before it connects, and Grandma presses nothing. Her daughter's voice fills the room for four minutes, and she goes to bed because family asked. Patients do things for the people they love that they won't do for anyone else.</p>
+        <div class="scene"><span class="tag">In her room</span>"It's late. Let them help you to bed. I'll see you Saturday." In bed by 9:49, sitting up the way she needs.</div>
+      </div>
+
+      <div class="step">
+        <div class="time">3:05 AM</div>
+        <h3 class="split">The hard moment finds you. Not the other way around.</h3>
+        <p>Grandma is up and anxious, and she won't settle for the night aide. Yar knows from her profile whose voice works, tells the nurse, and offers the family a way in. Two minutes later she's calm. Nobody waits for morning. Nobody drives across town in the dark.</p>
+      </div>
+
+      <div class="step">
+        <div class="time">7:02 AM · The next morning</div>
+        <h3 class="split">You knew everything. You drove nowhere.</h3>
+        <p>The morning summary is waiting with your coffee. The whole night, accounted for. The whole day ahead, planned. This is what Yar gives a family: their person, cared for and heard, and their own life back.</p>
+      </div>
+
+    </div>
+
+    <div class="device-col">
+      <div class="phone" id="dphone" aria-hidden="true">
+        <div class="screen">
+          <div class="screen-head"><span class="stime" id="pclock">7:14</span><span class="sdate" id="pdate">Morning · Room 250</span></div>
+          <div class="nstack" id="pfeed">
+            <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto fam">Family</span><span class="ntime">now</span></div><div class="ntitle">Breakfast finished</div><div class="nbody">Grandma ate well and asked for tea.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-close wrap">
+    <p class="big rv split">One iPad in her room. One app in your pocket. The whole day, heard.</p>
+    <a class="btn saffron rv d1" href="demo/index.html">Try it yourself, live</a>
+    <a class="btn ghost rv d2" href="#join" style="margin-left:10px">Join the waitlist</a>
+  </div>
+</section>
+
+<!-- ============ THREE PEOPLE, ONE HALLWAY ============ -->
+<section class="voices" id="voices">
+  <div class="wrap">
+    <div class="kicker rv">Who it's for</div>
+    <h2 class="rv d1 split">Three people, one hallway. Yar answers all of them.</h2>
+    <p class="sub rv d2">We spent weeks reading what families, nurses, and administrators actually say. These are their words, and this is what Yar does about them.</p>
+
+    <div class="persona">
+      <div>
+        <div class="p-label rv">The family</div>
+        <h3 class="rv d1 split">"I know nothing unless I'm standing in her room."</h3>
+        <p class="p-ans rv d2">Yar replaces the surveillance visit, never the love visit. The feed answers "is she okay" before the question forms, the digest says <strong>"Nothing unusual today"</strong> instead of going silent, and if Yar ever loses connection, it tells you that too. Silence is never ambiguous. <a href="demo/family.html" style="font-weight:700">Open the family app →</a></p>
+      </div>
+      <div class="p-quotes">
+        <div class="quote rv">Nobody returns my calls. The activities director, the floor nurse, the administrator. I keep a log now.<span class="src">Family caregiver forum</span></div>
+        <div class="quote right rv d1">I lie awake waiting for the phone to ring. The night call is the thing I dread most.<span class="src">Caregiver community</span></div>
+        <div class="quote stat-q rv d2">Families are already zip-tying video devices to nightstands and fighting facility WiFi to build this themselves.<span class="src">What our research found</span></div>
+      </div>
+    </div>
+
+    <div class="persona flip">
+      <div>
+        <div class="p-label rv">The nurse</div>
+        <h3 class="rv d1 split">"This makes your phone ring less."</h3>
+        <p class="p-ans rv d2">No new documentation, ever. Yar reads what you already chart and answers the family before they call. Yar understands the room in the moment and <strong>stores no footage of anyone</strong>. There is nothing to review, nothing to replay, nothing to be used against you. What it does keep is the log of every update families received, and that log is your armor when someone says "nobody ever tells us anything." <a href="demo/nurse.html" style="font-weight:700">Open the nurse station →</a></p>
+      </div>
+      <div class="p-quotes">
+        <div class="quote rv">Fifteen different family members calling for separate updates was a nightmare.<span class="src">Nursing forum</span></div>
+        <div class="quote right rv d1">Family told patient relations they "never get updates." My notes saved me: four entries showing they don't answer the phone.<span class="src">Nursing forum</span></div>
+        <div class="quote stat-q rv d2">Nurses already improvise Yar by hand: designated spokespersons, caller passwords, laminated family-call cheat sheets.<span class="src">What our research found</span></div>
+      </div>
+    </div>
+
+    <div class="persona">
+      <div>
+        <div class="p-label rv">The facility</div>
+        <h3 class="rv d1 split">"Be the building families ask for by name."</h3>
+        <p class="p-ans rv d2">Families choose on reputation and reviews, and communication failures are what fill complaint logs and survey citations. Yar turns family communication from your biggest complaint category into your differentiator, documents your language access, and costs less than a dollar per patient-day.</p>
+      </div>
+      <div class="p-quotes">
+        <div class="quote stat-q rv"><b>56%</b> of nursing facilities say they are struggling with occupancy right now.<span class="src">AHCA State of the Sector</span></div>
+        <div class="quote stat-q right rv d1"><b>49%</b> of malpractice claims involve communication failure, and those cases cost more.<span class="src">CRICO claims data</span></div>
+        <div class="quote stat-q rv d2"><b>$3.95/min</b> is the list rate facilities pay for phone interpretation. Yar carries the routine moments between interpreter sessions.<span class="src">LanguageLine published rates</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="modes" id="modes">
+  <div class="wrap">
+    <div class="kicker rv">Your day, your volume</div>
+    <h2 class="rv d1 split">Hear every moment. Or just the ones that matter.</h2>
+    <p class="sub rv d2">Every family member sets their own rhythm, and can change it anytime. Urgent moments ignore every setting and reach you instantly.</p>
+
+    <div class="seg rv d2" role="tablist">
+      <button class="seg-btn active" data-pane="0">Every event<small>as they happen</small></button>
+      <button class="seg-btn" data-pane="1">Scheduled summaries<small>all at once, on your time</small></button>
+    </div>
+
+    <div class="panes rv d3">
+      <div class="pane active">
+        <div class="pane-copy">
+          <h3>Live, as it happens.</h3>
+          <p>A notification for each event, timestamped, the moment the care team logs it or Yar hears it. For the family member who wants to feel the day in real time.</p>
+        </div>
+        <div class="pane-feed">
+          <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto fam">Family</span><span class="ntime">7:14 AM</span></div><div class="ntitle">Breakfast finished</div><div class="nbody">She ate well and asked for tea.</div></div>
+          <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto fam">Family</span><span class="ntime">10:05 AM</span></div><div class="ntitle">Therapy done</div><div class="nbody">Walked 40 feet with the walker.</div></div>
+          <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto fam">Family</span><span class="ntime">12:58 PM</span></div><div class="ntitle">Resolved: chest tightness</div><div class="nbody">Reported, assessed, vitals normal.<span class="ok">✓ Resolved</span></div></div>
+          <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto fam">Family</span><span class="ntime">4:12 PM</span></div><div class="ntitle">Shower complete</div><div class="nbody">With Maria. Preference honored.</div></div>
+        </div>
+      </div>
+      <div class="pane">
+        <div class="pane-copy">
+          <h3>Summaries, on your schedule.</h3>
+          <p>One message, on your schedule. Pick your rhythm below. And on a quiet day Yar says so: "Nothing unusual today." You never have to wonder what silence means. Anything urgent still reaches you the second it happens.</p>
+          <div class="chips" id="rhythm"><span class="chip active">Every 3 hours</span><span class="chip">Every 5 hours</span><span class="chip">Morning + night</span><span class="chip">Once a day</span></div>
+        </div>
+        <div class="pane-feed">
+          <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto fam">Family</span><span class="ntime">12:00 PM</span></div><div class="ntitle">Midday summary</div><div class="nbody">A good morning. Breakfast finished, therapy done, 40 feet walked. She's resting in the day room.</div></div>
+          <div class="notif urgent"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto fam">Family · always instant</span><span class="ntime">12:47 PM</span></div><div class="ntitle">She reported chest tightness</div><div class="nbody">Nurse Sarah is with her now. We'll follow up.</div></div>
+          <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto fam">Family</span><span class="ntime">6:00 PM</span></div><div class="ntitle">Evening summary</div><div class="nbody">All clear since this afternoon. Vitals stayed normal, shower done, dinner finished.</div></div>
+          <div class="notif"><div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto fam">Family</span><span class="ntime">Yesterday</span></div><div class="ntitle">Nothing unusual today</div><div class="nbody">A calm, ordinary day. She's okay.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="facilities" id="facilities">
+  <div class="wrap">
+    <div class="kicker rv">For facilities</div>
+    <h2 class="rv d1 split">Be the facility families ask for by name.</h2>
+    <p class="sub rv d2">When families stay notified, the phones ring less. When the phones ring less, your nurses move faster. When your nurses move faster, care gets better and the reviews follow. One device, three wins.</p>
+    <div class="fac-rows">
+      <div class="fac-row rv"><strong>Faster workflow, calmer floor.</strong><p>Every "how is she doing" call your nurses don't take is minutes back at the bedside. Families see the day as it happens, so they stop calling to reconstruct it.</p></div>
+      <div class="fac-row rv"><strong>Zero new documentation.</strong><p>Yar works from what your staff already charts. It reads. It never adds a field, a form, or a step.</p></div>
+      <div class="fac-row rv"><strong>A communication record that protects your staff.</strong><p>Every update a family receives is logged and exportable. When a complaint reaches patient relations, your team has the receipt.</p></div>
+      <div class="fac-row rv"><strong>Care preferences with a nurse in the loop.</strong><p>Families suggest, your staff approves with one tap, every shift sees it. Preferences reach the bedside before the moment, not during it.</p></div>
+      <div class="fac-row rv"><strong>The family voice as a care tool.</strong><p>Clinical trials show family presence reduces agitation and delirium. Yar lets family de-escalate at 3 a.m. and encourage therapy remotely, so your staff stop facing those moments alone.</p></div>
+    </div>
+    <div class="assure">
+      <div class="rv"><strong>Staff-safe by design</strong>Drop-ins announce themselves before connecting, any staff member can pause with one tap, and Yar stores no footage of anyone. There is nothing to review or replay.</div>
+      <div class="rv d1"><strong>Interpretation</strong>Yar supplements qualified medical interpreters. It never replaces them. It carries the routine moments between sessions and documents your language access effort.</div>
+      <div class="rv d2"><strong>Consent first</strong>Resident and roommate consent built in, compliant with authorized electronic monitoring laws like Minnesota Statute § 144.6502.</div>
+      <div class="rv d3"><strong>Integration</strong>Yar connects to the charting systems your teams already use. No new software for your staff to learn.</div>
+    </div>
+    <div class="fac-cta rv">
+      <a class="btn saffron" href="demo/facility.html">Open the facility dashboard</a>
+      <a class="btn ghost" href="mailto:noahrskaggs@gmail.com?subject=Yar%20facility%20demo" style="margin-left:10px">Talk to us</a>
+    </div>
+  </div>
+</section>
+
+<section class="sheet join" id="join">
+  <div class="glyph-bg" aria-hidden="true">یار</div>
+  <div class="kicker rv">Early access</div>
+  <h2 class="rv d1 split">Never wonder again.</h2>
+  <p class="sub rv d2">We're starting with a small number of families and one facility at a time, beginning where this story began. Tell us about your person.</p>
+  <a class="btn saffron rv d3" href="mailto:noahrskaggs@gmail.com?subject=Yar%20waitlist&body=Tell%20us%20who%20you're%20caring%20for%2C%20what%20language%20they%20speak%2C%20and%20what%20you%20wish%20you%20could%20see%20on%20your%20phone.">Join the waitlist</a>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="fa">یار</span>
+    <p>Yar (یار) is Farsi for <em>companion, the one at your side.</em></p>
+    <p class="closer">Built so that no one is left unheard.</p>
+    <p style="margin-top:18px">© 2026 Yar</p>
+  </div>
+</footer>
+
+<script>
+/* Every feature isolated; failure can never blank the page. */
+
+/* Scroll progress */
+try {
+  var prog = document.getElementById('progress');
+  var onProg = function(){
+    var h = document.documentElement.scrollHeight - innerHeight;
+    prog.style.transform = 'scaleX(' + (h > 0 ? scrollY / h : 0) + ')';
+  };
+  addEventListener('scroll', onProg, { passive: true }); onProg();
+} catch(e){}
+
+/* Word splitter for headline rises (runs before reveal observer) */
+try {
+  document.querySelectorAll('.split').forEach(function(el){
+    var walk = function(node){
+      [].slice.call(node.childNodes).forEach(function(ch){
+        if (ch.nodeType === 3) {
+          var frag = document.createDocumentFragment();
+          ch.textContent.split(/(\s+)/).forEach(function(part){
+            if (/^\s+$/.test(part) || part === '') { frag.appendChild(document.createTextNode(part)); }
+            else { var s = document.createElement('span'); s.className = 'w'; s.textContent = part; frag.appendChild(s); }
+          });
+          node.replaceChild(frag, ch);
+        } else if (ch.nodeType === 1) walk(ch);
+      });
+    };
+    walk(el);
+    [].slice.call(el.querySelectorAll('.w')).forEach(function(w, i){ w.style.transitionDelay = (i * 45) + 'ms'; });
+  });
+} catch(e){}
+
+/* Reveal on scroll + failsafe */
+try {
+  var rvs = [].slice.call(document.querySelectorAll('.rv, .split'));
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  rvs.forEach(function(el){ io.observe(el); });
+  setTimeout(function(){
+    var any = rvs.some(function(el){ return el.classList.contains('in'); });
+    if (!any) rvs.forEach(function(el){ el.classList.add('in'); });
+  }, 1600);
+} catch(e) {
+  document.querySelectorAll('.rv, .split').forEach(function(el){ el.classList.add('in'); });
+}
+
+/* Count-up stats (markup holds final values as fallback) */
+try {
+  var cio = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      cio.unobserve(e.target);
+      var end = parseFloat(e.target.dataset.count);
+      var dec = end % 1 ? 1 : 0;
+      var t0 = performance.now();
+      (function tick(t){
+        var p = Math.min((t - t0) / 1400, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        e.target.textContent = (end * eased).toFixed(dec);
+        if (p < 1) requestAnimationFrame(tick);
+      })(t0);
+    });
+  }, { threshold: 0.6 });
+  document.querySelectorAll('[data-count]').forEach(function(el){ cio.observe(el); });
+} catch(e){}
+
+/* Subtle hero glyph drift */
+try {
+  var pg = document.getElementById('pglyph');
+  addEventListener('scroll', function(){
+    pg.style.transform = 'translateY(' + scrollY * 0.1 + 'px)';
+  }, { passive: true });
+} catch(e){}
+
+/* ---- Live the day ---- */
+try {
+  function N(to, title, body, opts) {
+    opts = opts || {};
+    return { to: to, title: title, body: body, urgent: !!opts.urgent, call: !!opts.call, time: opts.time || 'now' };
+  }
+  var DAY = [
+    { mode: 'm-morn', clock: '7:14', date: 'Morning · Room 250', night: false, cards: [
+      N('fam', 'Good morning', 'Grandma is up and dressed.', { time: '7:02 AM' }),
+      N('fam', 'Breakfast finished', 'She ate well and asked for tea. The aide says she\'s pleasant this morning.', { time: '7:14 AM' })
+    ]},
+    { mode: 'm-day', clock: '12:47', date: 'Midday · Room 250', night: false, cards: [
+      N('nur', 'Room 250 · Urgent', 'Cough, chest tightness, and dizziness reported, spoken in Farsi. Immediate assessment recommended.', { urgent: true, time: '12:47 PM' }),
+      N('fam', 'She was heard', 'Grandma said her chest felt tight and she was dizzy. Nurse Sarah is with her now.', { time: '12:49 PM' }),
+      N('fam', 'Resolved', 'Vitals are normal and the doctor has been notified. We\'ll keep you posted.', { time: '12:58 PM' })
+    ]},
+    { mode: 'm-day', clock: '3:20', date: 'Afternoon · Room 250', night: false, cards: [
+      N('nur', 'Preference conflict', 'Room 250 requires a female caregiver for bathing. Assigned aide today is male. Suggest Maria, or 4:00.', { time: '3:20 PM' }),
+      N('fam', 'Preference protected', 'Shower moved to 4:00 with Maria. Caught before it reached her door. Nothing is wrong.', { time: '3:24 PM' })
+    ]},
+    { mode: 'm-dusk', clock: '9:41', date: 'Evening · Room 250', night: false, cards: [
+      N('fam', 'Voice drop-in · 4:12', '', { call: true, time: '9:41 PM' })
+    ]},
+    { mode: 'm-night', clock: '3:05', date: 'Overnight · Room 250', night: true, cards: [
+      N('nur', 'Room 250 awake, distressed', 'De-escalation cue from profile: her daughter\'s voice calms her. Family offered a drop-in.', { time: '3:05 AM' }),
+      N('fam', 'Grandma is awake and anxious', 'The nurse has been alerted.<span class="talk">Tap to talk to her</span>', { urgent: true, time: '3:05 AM' }),
+      N('fam', 'Back asleep and calm', 'After your voice call. Two minutes was all she needed.<span class="ok">✓ Resolved</span>', { time: '3:14 AM' })
+    ]},
+    { mode: 'm-dawn', clock: '7:02', date: 'The next morning', night: false, cards: [
+      N('fam', 'Morning summary', 'She slept through the rest of the night. No further concerns. PT at 10:00, shower with Maria at 2:00.', { time: '7:02 AM' }),
+      N('fam', 'From Yar', 'She\'s okay. Go live your morning.', { time: '7:02 AM' })
+    ]}
+  ];
+
+  var demo = document.getElementById('day');
+  var steps = [].slice.call(demo.querySelectorAll('.step'));
+  var pfeed = document.getElementById('pfeed');
+  var pclock = document.getElementById('pclock');
+  var pdate = document.getElementById('pdate');
+  var dphone = document.getElementById('dphone');
+  var curStep = -1;
+  var timers = [];
+
+  function cardEl(c) {
+    var el = document.createElement('div');
+    el.className = 'notif' + (c.urgent ? ' urgent' : '');
+    var head = '<div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto ' + (c.to === 'nur' ? 'nur">Nurse station' : 'fam">Family') + '</span><span class="ntime">' + c.time + '</span></div>';
+    if (c.call) {
+      el.innerHTML = head + '<div class="ntitle">' + c.title + '</div>' +
+        '<div class="cavatar-row"><div class="cavatar">یار</div><div class="nbody">"It\'s late. Let them help you to bed. I\'ll see you Saturday."</div></div>' +
+        '<div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i></div>';
+    } else {
+      el.innerHTML = head + '<div class="ntitle">' + c.title + '</div><div class="nbody">' + c.body + '</div>';
+    }
+    return el;
+  }
+  function trim() { while (pfeed.children.length > 4) pfeed.removeChild(pfeed.lastChild); }
+
+  /* Notification chime, opt-in */
+  var actx = null, soundOn = false;
+  var soundbtn = document.getElementById('soundbtn');
+  function tone(f, t, vol) {
+    var o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.025);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.8);
+    o.connect(g); g.connect(actx.destination);
+    o.start(t); o.stop(t + 0.85);
+  }
+  /* Soft "ba-da" bell, like a normal phone notification. Urgent repeats it. */
+  function ding(urgent) {
+    if (!soundOn) return;
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      var t = actx.currentTime + 0.01;
+      tone(1046.5, t, 0.11); tone(784, t + 0.16, 0.09);
+      if (urgent) { tone(1046.5, t + 0.42, 0.1); tone(784, t + 0.58, 0.08); }
+    } catch(e){}
+  }
+  soundbtn.addEventListener('click', function(){
+    soundOn = !soundOn;
+    soundbtn.classList.toggle('on', soundOn);
+    soundbtn.setAttribute('aria-pressed', String(soundOn));
+    soundbtn.textContent = soundOn ? '🔔 Sound is on' : '🔔 Turn sound on for the full experience';
+    if (soundOn) ding(false);
+  });
+
+  function stackFor(uptoStep) {
+    var all = [];
+    for (var s = 0; s <= uptoStep; s++) DAY[s].cards.forEach(function(c){ all.unshift(c); });
+    return all.slice(0, 4);
+  }
+  function dropCard(c) {
+    var el = cardEl(c);
+    el.classList.add('drop');
+    pfeed.prepend(el);
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.remove('drop'); }); });
+    ding(c.urgent);
+    dphone.classList.remove('buzz'); void dphone.offsetWidth; dphone.classList.add('buzz');
+    trim();
+  }
+  function setStep(i) {
+    if (i === curStep) return;
+    var forward = i > curStep;
+    curStep = i;
+    timers.forEach(clearTimeout); timers = [];
+    demo.className = 'demo ' + DAY[i].mode;
+    dphone.classList.toggle('nightscreen', DAY[i].night);
+    pclock.textContent = DAY[i].clock;
+    pdate.textContent = DAY[i].date;
+    if (!forward) {
+      pfeed.innerHTML = '';
+      stackFor(i).forEach(function(c){ pfeed.appendChild(cardEl(c)); });
+      return;
+    }
+    pfeed.innerHTML = '';
+    stackFor(i - 1).forEach(function(c){ pfeed.appendChild(cardEl(c)); });
+    DAY[i].cards.forEach(function(c, k){
+      timers.push(setTimeout(function(){ dropCard(c); }, 900 + k * 2100));
+    });
+  }
+  var sio = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if (e.isIntersecting) setStep(steps.indexOf(e.target)); });
+  }, { threshold: 0.55 });
+  steps.forEach(function(s){ sio.observe(s); });
+  setStep(0);
+} catch(e){}
+
+/* Notification mode toggle */
+try {
+  var segBtns = [].slice.call(document.querySelectorAll('.seg-btn'));
+  var panes = [].slice.call(document.querySelectorAll('.pane'));
+  segBtns.forEach(function(b){ b.addEventListener('click', function(){
+    segBtns.forEach(function(x){ x.classList.toggle('active', x === b); });
+    panes.forEach(function(p, i){ p.classList.toggle('active', i === +b.dataset.pane); });
+  }); });
+} catch(e){}
+
+/* Hero notification loop */
+try {
+  var heroData = [
+    { to: 'fam', title: 'Breakfast finished', body: 'She ate well and asked for tea.', time: '7:14 AM' },
+    { to: 'nur', title: 'Room 250 · Urgent', body: 'Chest tightness and dizziness reported, in Farsi. Assessment recommended.', time: '12:47 PM', urgent: true },
+    { to: 'fam', title: 'Resolved', body: 'Nurse Sarah responded in minutes. Vitals normal.', time: '12:58 PM' },
+    { to: 'fam', title: 'Goodnight call', body: 'Four minutes. She went to bed smiling.', time: '9:41 PM' },
+    { to: 'fam', title: 'Nothing unusual today', body: 'A calm, ordinary day. She\'s okay.', time: '8:00 PM' }
+  ];
+  var feed = document.getElementById('feed');
+  var fi = 0;
+  function pushHero() {
+    var d = heroData[fi % heroData.length]; fi++;
+    var el = document.createElement('div');
+    el.className = 'notif' + (d.urgent ? ' urgent' : '') + ' drop';
+    el.innerHTML = '<div class="nhead"><span class="nicon">یار</span><span class="napp">YAR</span><span class="nto ' + (d.to === 'nur' ? 'nur">Nurse station' : 'fam">Family') + '</span><span class="ntime">' + d.time + '</span></div><div class="ntitle">' + d.title + '</div><div class="nbody">' + d.body + '</div>';
+    feed.prepend(el);
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.remove('drop'); }); });
+    while (feed.children.length > 4) feed.removeChild(feed.lastChild);
+  }
+  setTimeout(pushHero, 1600);
+  setInterval(pushHero, 4600);
+} catch(e){}
+
+/* Rhythm chips (cosmetic picker) */
+try {
+  var chips = [].slice.call(document.querySelectorAll('#rhythm .chip'));
+  chips.forEach(function(c){ c.addEventListener('click', function(){
+    chips.forEach(function(x){ x.classList.toggle('active', x === c); });
+  }); });
+} catch(e){}
+</script>
+
+</body>
+</html>

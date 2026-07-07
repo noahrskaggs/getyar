@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yar Demo · Nurse Station</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23faf6ef'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Georgia' font-size='26' fill='%23b9731f'%3E%DB%8C%D8%A7%D8%B1%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:#faf6ef; --cream-2:#f3ecdf; --ink:#1e3a34; --ink-deep:#142823;
+    --ink-soft:#47605a; --saffron:#d98e32; --saffron-deep:#b9731f;
+    --card:#fff; --line:#e7dfd2; --teal:#2e6b5e; --red:#b8563f; --ease:cubic-bezier(.22,.8,.24,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--cream);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .topbar{display:flex;align-items:center;gap:14px;padding:16px 24px;max-width:1280px;margin:0 auto}
+  .topbar .back{text-decoration:none;font-weight:600;font-size:14px;color:var(--ink-soft)}
+  .topbar .back:hover{color:var(--ink)}
+  .demo-tag{margin-left:auto;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--saffron-deep);border:1.5px solid var(--saffron);border-radius:999px;padding:5px 14px}
+
+  .head{max-width:1280px;margin:6px auto 20px;padding:0 24px;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+  .head h1{font-family:'Fraunces',serif;font-size:32px;font-weight:600}
+  .head .shift{font-size:14px;color:var(--ink-soft)}
+  .head .sound{margin-left:auto;border:1.5px solid var(--saffron-deep);background:transparent;color:var(--ink);border-radius:999px;padding:9px 18px;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer}
+  .head .sound.on{background:var(--saffron-deep);color:var(--cream)}
+
+  .grid{max-width:1280px;margin:0 auto 60px;padding:0 24px;display:grid;grid-template-columns:1.35fr .9fr;gap:24px;align-items:start}
+
+  /* Floor map */
+  .floor{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px}
+  .floor .flabel{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:16px;display:flex;gap:18px;flex-wrap:wrap}
+  .flabel .lg{display:inline-flex;align-items:center;gap:6px}
+  .flabel .sw{width:10px;height:10px;border-radius:3px}
+  .rooms{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+  .hall{grid-column:1/-1;height:20px;display:grid;place-items:center;font-size:10px;letter-spacing:.3em;color:var(--ink-soft);text-transform:uppercase}
+  .room{border:1.5px solid var(--line);border-radius:14px;padding:12px 10px;background:var(--cream);cursor:pointer;text-align:center;transition:transform .2s var(--ease),box-shadow .2s;position:relative}
+  .room:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(30,58,52,.12)}
+  .room .no{font-family:'Fraunces',serif;font-weight:600;font-size:17px}
+  .room .nm{font-size:11px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .room.calm{border-color:#cfe0d8;background:#f2f8f5}
+  .room.visit{border-color:var(--teal)}
+  .room.visit::after{content:"🎙 family here";position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--teal);color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:2px 8px;white-space:nowrap}
+  .room.attn{border-color:var(--saffron);background:#fdf4e7}
+  .room.urgent{border-color:var(--red);background:#fbeae5;animation:throb 1.4s ease-in-out infinite}
+  @keyframes throb{0%,100%{box-shadow:0 0 0 0 rgba(184,86,63,.35)}50%{box-shadow:0 0 0 9px rgba(184,86,63,0)}}
+  .room.empty{opacity:.45;cursor:default}
+  .room.sel{outline:2.5px solid var(--ink)}
+
+  /* Right column: alerts + detail */
+  .col{display:flex;flex-direction:column;gap:24px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px}
+  .panel h2{font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .count{font-size:11px;font-weight:700;background:var(--saffron-deep);color:var(--cream);border-radius:999px;padding:3px 9px}
+  .alerts{display:flex;flex-direction:column;gap:9px;max-height:330px;overflow:hidden}
+  .al{border:1px solid var(--line);border-radius:14px;padding:11px 13px;font-size:13px;line-height:1.45;background:var(--cream)}
+  .al .top{display:flex;gap:8px;align-items:center;margin-bottom:3px}
+  .al .rm{font-weight:700;font-size:12px}
+  .al .tt{margin-left:auto;font-size:11px;color:#9aa8a3}
+  .al .kind{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border-radius:999px;padding:2px 8px}
+  .al.urgent{border-color:var(--red);background:#fbeae5}
+  .al.urgent .kind{background:var(--red);color:#fff}
+  .al.attn .kind{background:#fdf0dd;color:var(--saffron-deep)}
+  .al.info .kind{background:#e4efeb;color:var(--teal)}
+  .al .fa{direction:rtl;display:block;text-align:right;font-family:Georgia,serif;font-size:15px;margin:4px 0 2px}
+  .al .ack{margin-top:7px;border:0;background:var(--ink);color:var(--cream);font-family:'Inter',sans-serif;font-size:11.5px;font-weight:700;border-radius:999px;padding:6px 14px;cursor:pointer}
+  .al.done{opacity:.55}
+  .al.done .ack{background:#2e7d5b;pointer-events:none}
+  html.js .al.pop{animation:alpop .7s var(--ease)}
+  @keyframes alpop{from{opacity:0;transform:translateY(-14px) scale(.97)}}
+
+  .detail .empty-d{color:var(--ink-soft);font-size:14px;text-align:center;padding:14px 0}
+  .d-row{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+  .d-avatar{width:44px;height:44px;border-radius:999px;background:var(--cream-2);display:grid;place-items:center;font-family:Georgia,serif;font-size:19px;color:var(--saffron-deep)}
+  .d-row b{display:block;font-size:16px}
+  .d-row small{color:var(--ink-soft);font-size:12.5px}
+  .d-sec{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);margin:14px 0 8px}
+  .d-pref{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;padding:9px 12px;background:var(--cream);border:1px solid var(--line);border-radius:12px;margin-bottom:7px}
+  .d-pref .b{margin-left:auto;font-size:10px;font-weight:700;text-transform:uppercase;color:var(--teal);white-space:nowrap}
+  .d-pref.pending{border-color:var(--saffron)}
+  .d-pref.pending .apr{margin-left:auto;border:0;background:var(--saffron-deep);color:#fff;border-radius:999px;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;cursor:pointer;white-space:nowrap}
+  .d-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .d-actions button{border:1.5px solid var(--line);background:var(--cream);color:var(--ink);border-radius:999px;padding:9px 15px;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer}
+  .d-actions .pause{border-color:var(--teal);color:var(--teal)}
+  .d-note{margin-top:14px;font-size:12px;color:var(--ink-soft);line-height:1.5;border-top:1px dashed var(--line);padding-top:12px}
+
+  .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--cream);font-size:13.5px;font-weight:600;border-radius:999px;padding:12px 24px;opacity:0;transition:all .4s var(--ease);pointer-events:none;white-space:nowrap;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:980px){ .grid{grid-template-columns:1fr} .rooms{grid-template-columns:repeat(4,1fr)} }
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js');</script>
+
+<div class="topbar">
+  <a class="back" href="../index.html">← Back to Yar</a>
+  <span class="demo-tag">Interactive demo · sample data</span>
+</div>
+
+<div class="head">
+  <h1>East Wing · Nurse Station</h1>
+  <span class="shift">Day shift · Sarah RN, Maria CNA, Julio CNA · 22 residents</span>
+  <button class="sound" id="soundbtn">🔔 Sound on</button>
+</div>
+
+<div class="grid">
+  <div class="floor">
+    <div class="flabel">
+      <span class="lg"><span class="sw" style="background:#cfe0d8"></span>Calm</span>
+      <span class="lg"><span class="sw" style="background:var(--saffron)"></span>Needs attention</span>
+      <span class="lg"><span class="sw" style="background:var(--red)"></span>Urgent</span>
+      <span class="lg"><span class="sw" style="background:var(--teal)"></span>Family visiting by Yar</span>
+      <span style="margin-left:auto">Tap any room</span>
+    </div>
+    <div class="rooms" id="rooms"></div>
+  </div>
+
+  <div class="col">
+    <div class="panel">
+      <h2>Live alerts <span class="count" id="acount">2</span></h2>
+      <div class="alerts" id="alerts"></div>
+    </div>
+
+    <div class="panel detail" id="detail">
+      <div class="empty-d">Tap a room on the floor map to see the resident's Yar profile.</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+try {
+  /* ---- Data ---- */
+  var ROOMS = [
+    {no:240,nm:'H. Yang',st:'calm',lang:'Hmong'},
+    {no:241,nm:'A. Warsame',st:'calm',lang:'Somali'},
+    {no:242,nm:'M. Ivanova',st:'calm',lang:'Russian'},
+    {no:243,nm:'',st:'empty',lang:''},
+    {no:244,nm:'J. Peterson',st:'calm',lang:'English'},
+    {no:245,nm:'K. Moua',st:'visit',lang:'Hmong'},
+    {no:'H1',hall:true},
+    {no:246,nm:'D. Ali',st:'calm',lang:'Somali'},
+    {no:247,nm:'R. Johnson',st:'attn',lang:'English'},
+    {no:248,nm:'S. Osman',st:'calm',lang:'Oromo'},
+    {no:249,nm:'',st:'empty',lang:''},
+    {no:250,nm:'Grandma',st:'urgent',lang:'Farsi'},
+    {no:251,nm:'T. Vang',st:'calm',lang:'Hmong'}
+  ];
+  var PROFILES = {
+    250:{name:'Grandma',lang:'Farsi',prefs:[
+        {t:'Sleeps sitting up. Lying flat causes panic; oxygen resolves it.',ok:true},
+        {t:'Female caregivers only for bathing.',ok:true},
+        {t:'Her daughter’s voice calms her at night.',ok:true},
+        {t:'She likes the window blinds open in the morning.',ok:false}
+      ],visit:false},
+    245:{name:'K. Moua',lang:'Hmong',prefs:[
+        {t:'Son translates for major decisions; use interpreter line for care talk.',ok:true},
+        {t:'Prefers meals with rice; family brings pepper sauce Fridays.',ok:true}
+      ],visit:true},
+    247:{name:'R. Johnson',lang:'English',prefs:[
+        {t:'Hard of hearing, left side. Speak to his right.',ok:true}
+      ],visit:false}
+  };
+
+  var roomsEl = document.getElementById('rooms');
+  ROOMS.forEach(function(r){
+    if (r.hall) { var h=document.createElement('div');h.className='hall';h.textContent='· · · hallway · · ·';roomsEl.appendChild(h);return; }
+    var d=document.createElement('div');
+    d.className='room '+r.st; d.dataset.no=r.no;
+    d.innerHTML='<div class="no">'+r.no+'</div><div class="nm">'+(r.nm||'Empty')+'</div>';
+    if (r.st!=='empty') d.addEventListener('click',function(){select(r.no)});
+    roomsEl.appendChild(d);
+  });
+
+  /* ---- Toast + sound ---- */
+  var toast=document.getElementById('toast'),toastT;
+  function say(m){toast.textContent=m;toast.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){toast.classList.remove('show')},2800)}
+  var actx=null,soundOn=false,soundbtn=document.getElementById('soundbtn');
+  function tone(f,t,v){var o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=f;
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.025);g.gain.exponentialRampToValueAtTime(.0001,t+.8);
+    o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+.85)}
+  function ding(urgent){if(!soundOn)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==='suspended')actx.resume();var t=actx.currentTime+.01;
+    tone(1046.5,t,.11);tone(784,t+.16,.09);if(urgent){tone(1046.5,t+.42,.1);tone(784,t+.58,.08)}}catch(e){}}
+  soundbtn.addEventListener('click',function(){soundOn=!soundOn;soundbtn.classList.toggle('on',soundOn);
+    soundbtn.textContent=soundOn?'🔔 Sound is on':'🔔 Sound on';if(soundOn)ding(false)});
+
+  /* ---- Alerts ---- */
+  var alertsEl=document.getElementById('alerts'),acount=document.getElementById('acount'),alive=0;
+  function addAlert(a){
+    var d=document.createElement('div');
+    d.className='al pop '+a.level;
+    d.innerHTML='<div class="top"><span class="rm">Room '+a.room+'</span><span class="kind">'+a.kind+'</span><span class="tt">'+a.time+'</span></div>'
+      +(a.fa?'<span class="fa">'+a.fa+'</span>':'')
+      +'<span>'+a.text+'</span>'
+      +(a.ack?'<br><button class="ack">Acknowledge</button>':'');
+    alertsEl.prepend(d);
+    while(alertsEl.children.length>5)alertsEl.removeChild(alertsEl.lastChild);
+    if(a.ack){alive++;acount.textContent=alive;
+      d.querySelector('.ack').addEventListener('click',function(){
+        d.classList.add('done');this.textContent='✓ Acknowledged · logged';alive--;acount.textContent=alive;
+        say('Logged. The family sees the outcome, not the scramble.');
+        if(a.room===250){setRoomState(250,'calm')}
+      });}
+    ding(a.level==='urgent');
+  }
+  function setRoomState(no,st){
+    var r=roomsEl.querySelector('[data-no="'+no+'"]');
+    if(r){r.className='room '+st+(r.classList.contains('sel')?' sel':'')}
+  }
+
+  /* Seed alerts */
+  addAlert({room:247,level:'attn',kind:'Assist',time:'12:31 PM',text:'Asked for help to the bathroom. Julio en route.',ack:false});
+  addAlert({room:250,level:'urgent',kind:'Symptom · translated',time:'12:47 PM',fa:'قفسه سینه‌ام تنگ است و سرگیجه دارم',text:'"My chest feels tight and I’m dizzy." Spoken in Farsi. Possible cardiac symptoms. Assessment recommended now.',ack:true});
+
+  /* Live loop of ambient events */
+  var LOOP=[
+    {room:245,level:'info',kind:'Family visit',time:'now',text:'Daughter dropped in by voice. Announced in room, 3 min so far.',ack:false},
+    {room:241,level:'info',kind:'Charted',time:'now',text:'Lunch charted: ate 75%. Family notified in Somali.',ack:false},
+    {room:248,level:'attn',kind:'Preference',time:'now',text:'Bathing scheduled 2:00 PM. Reminder: female caregiver required (profile).',ack:true},
+    {room:240,level:'info',kind:'Comfort',time:'now',text:'Asked for water in Hmong. Translated and routed to Maria.',ack:false}
+  ];
+  var li=0;
+  setInterval(function(){addAlert(LOOP[li%LOOP.length]);li++;},7000);
+
+  /* ---- Room detail ---- */
+  var detail=document.getElementById('detail');
+  function select(no){
+    [].slice.call(roomsEl.querySelectorAll('.room')).forEach(function(r){r.classList.toggle('sel',r.dataset.no==no)});
+    var p=PROFILES[no];
+    if(!p){detail.innerHTML='<div class="empty-d">Room '+no+': no Yar profile on file yet.</div>';return;}
+    var prefs=p.prefs.map(function(x){
+      return x.ok
+        ? '<div class="d-pref">'+x.t+'<span class="b">✓ approved</span></div>'
+        : '<div class="d-pref pending">'+x.t+'<button class="apr">Approve</button></div>';
+    }).join('');
+    detail.innerHTML=
+      '<div class="d-row"><div class="d-avatar">یار</div><div><b>Room '+no+' · '+p.name+'</b><small>Speaks '+p.lang+' · family plan: summaries + urgent</small></div></div>'
+      +'<div class="d-sec">Care profile · family suggested, nurse approved</div>'+prefs
+      +'<div class="d-sec">Presence</div>'
+      +'<div class="d-actions">'
+      +(p.visit?'<button class="pause" id="pausev">⏸ Pause family visit (care in progress)</button>':'<button disabled style="opacity:.5">No family visit right now</button>')
+      +'<button id="exportlog">⬇ Export communication log</button></div>'
+      +'<div class="d-note">Yar understands this room in the moment and stores no footage or audio. The only record is the message log, and it protects you.</div>';
+    var apr=detail.querySelector('.apr');
+    if(apr)apr.addEventListener('click',function(){
+      var row=this.parentNode;row.classList.remove('pending');
+      row.innerHTML=row.textContent.replace('Approve','')+'<span class="b">✓ approved</span>';
+      p.prefs.forEach(function(x){x.ok=true});
+      say('Approved. Every shift sees it from now on.');
+    });
+    var ex=detail.querySelector('#exportlog');
+    if(ex)ex.addEventListener('click',function(){say('Communication log exported: 34 family updates this week, all timestamped.')});
+    var pv=detail.querySelector('#pausev');
+    if(pv)pv.addEventListener('click',function(){this.textContent='✓ Paused · family sees "care in progress"';this.disabled=true;
+      say('Visit paused. Family sees a care-in-progress notice, never the room.')});
+  }
+  select(250);
+} catch(e){}
+</script>
+
+</body>
+</html>
