@@ -207,7 +207,7 @@ body{background:linear-gradient(180deg,#fffaf0 0%,#fbe3bd 55%,#f3bc7c 100%) fixe
             <div class="locked"><span class="sw"></span> Always instant. Urgent moments ignore every setting above.</div>
           </div>
           <div class="set"><b>Family access</b>
-            <div class="tier">Mina (you)<span class="t-badge">Spokesperson</span></div>
+            <div class="tier">Baharik (you)<span class="t-badge">Spokesperson</span></div>
             <div class="tier">Noah<span class="t-badge" style="color:var(--teal)">Approved family</span></div>
             <div class="tier">Cousin Dara<span class="t-badge" style="color:var(--ink-soft)">View only</span></div>
           </div>
@@ -273,7 +273,7 @@ try {
       timerI=null,secs=0;
   function startCall(video){
     call.classList.add('on');secs=0;
-    announce.textContent='🔊 In her room: "Mina is calling to visit…"';
+    announce.textContent='🔊 In her room: "Baharik is calling to visit…"';
     callstat.textContent='Announcing · 3';callwave.style.visibility='hidden';
     var n=3;var cd=setInterval(function(){n--;if(n>0){callstat.textContent='Announcing · '+n}else{
       clearInterval(cd);callstat.textContent=(video?'Video':'Voice')+' visit · 0:00';callwave.style.visibility='visible';
@@ -317,7 +317,7 @@ try {
   function scheduleBanner(ms){clearTimeout(bannerTimer);bannerTimer=setTimeout(showBanner,ms)}
   banner.addEventListener('click',function(){
     banner.classList.remove('show');
-    announce.textContent='🔊 In her room: "Mina is here with you…"';
+    announce.textContent='🔊 In her room: "Baharik is here with you…"';
     startCall(false);
     scheduleBanner(60000);   // it can happen again; this is the demo loop
   });
